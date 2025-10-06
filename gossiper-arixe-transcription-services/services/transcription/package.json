@@ -1,0 +1,23 @@
+{
+    "name": "vercel-transcription-service",
+    "version": "1.0.0",
+    "description": "Serverless transcription service using AssemblyAI",
+    "main": "index.js",
+    "scripts": {
+      "dev": "vercel dev",
+      "build": "tsc",
+      "deploy": "vercel --prod"
+    },
+    "dependencies": {
+      "assemblyai": "^4.0.0",
+      "multer": "^1.4.5-lts.1"
+    },
+    "devDependencies": {
+      "@types/node": "^20.0.0",
+      "@types/multer": "^1.4.11",
+      "typescript": "^5.0.0"
+    },
+    "engines": {
+      "node": ">=18.0.0"
+    }
+  }
