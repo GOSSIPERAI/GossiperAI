@@ -2,6 +2,10 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase-client'
+import { AuthValidator } from '@/lib/auth-validation'
+import { RateLimiter } from '@/lib/auth-security'
+import { handleAuthError, handleSupabaseError } from '@/lib/auth-error-handler'
+import { validateSession, type User, type AuthResult } from '@/lib/auth-utils'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 
 interface User {
@@ -16,23 +20,29 @@ interface User {
 interface AuthContextType {
   user: User | null
   isLoading: boolean
-  signUp: (email: string, password: string, userData: { name: string; role: 'student' | 'lecturer' }) => Promise<{ error: any }>
-  signIn: (email: string, password: string) => Promise<{ error: any }>
+  signUp: (email: string, password: string, userData: { name: string; role: 'student' | 'lecturer' }) => Promise<AuthResult>
+  signIn: (email: string, password: string) => Promise<AuthResult>
   signOut: () => Promise<void>
-  signInWithWallet: (walletAddress: string) => Promise<{ error: any; isNewUser?: boolean }>
-  signUpWithWallet: (walletAddress: string, userData: { name: string; role: 'student' | 'lecturer' }) => Promise<{ error: any }>
-  updateProfile: (updates: { name?: string; role?: string }) => Promise<{ error: any }>
+  signInWithWallet: (walletAddress: string) => Promise<AuthResult & { isNewUser?: boolean }>
+  signUpWithWallet: (walletAddress: string, userData: { name: string; role: 'student' | 'lecturer' }) => Promise<AuthResult>
+  updateProfile: (updates: { name?: string; role?: string }) => Promise<AuthResult>
+  refreshUser: () => Promise<void>
+  connectWallet: (walletAddress: string) => Promise<AuthResult>
+  disconnectWallet: () => Promise<AuthResult>
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
-  signUp: async () => ({ error: null }),
-  signIn: async () => ({ error: null }),
+  signUp: async () => ({ success: false, error: 'Not implemented' }),
+  signIn: async () => ({ success: false, error: 'Not implemented' }),
   signOut: async () => {},
-  signInWithWallet: async () => ({ error: null }),
-  signUpWithWallet: async () => ({ error: null }),
-  updateProfile: async () => ({ error: null }),
+  signInWithWallet: async () => ({ success: false, error: 'Not implemented' }),
+  signUpWithWallet: async () => ({ success: false, error: 'Not implemented' }),
+  updateProfile: async () => ({ success: false, error: 'Not implemented' }),
+  refreshUser: async () => {},
+  connectWallet: async () => ({ success: false, error: 'Not implemented' }),
+  disconnectWallet: async () => ({ success: false, error: 'Not implemented' }),
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -116,16 +126,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const signUp = async (email: string, password: string, userData: { name: string; role: 'student' | 'lecturer' }) => {
+  const signUp = async (email: string, password: string, userData: { name: string; role: 'student' | 'lecturer' }): Promise<AuthResult> => {
     try {
+      // Client-side validation
+      const validation = AuthValidator.validateSignupForm({
+        email,
+        username: userData.name,
+        password,
+        displayName: userData.name,
+        role: userData.role
+      })
+
+      if (!validation.valid) {
+        const firstError = Object.values(validation.errors)[0]
+        return { success: false, error: firstError }
+      }
+
+      // Rate limiting check
+      const clientId = email // Use email as identifier for rate limiting
+      if (!RateLimiter.checkRateLimit(clientId)) {
+        return { success: false, error: 'Rate limit exceeded' }
+      }
+
       console.log('🔐 [SUPABASE] Starting signup for:', email)
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: email.toLowerCase().trim(),
         password,
         options: {
           data: {
-            full_name: userData.name,
-            role: userData.role
+            full_name: userData.name.trim(),
+            role: userData.role,
+            username: userData.name.toLowerCase().trim().replace(/[^a-zA-Z0-9_-]/g, '')
           }
         }
       })
@@ -134,22 +165,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.log('🔐 [SUPABASE] Signup failed:', error.message)
-        return { error: new Error(error.message) }
+        const errorMessage = handleSupabaseError(error)
+        return { success: false, error: errorMessage }
       }
 
       console.log('🔐 [SUPABASE] Signup successful')
-      return { error: null }
+      return { success: true, user: data.user }
     } catch (error) {
       console.error('🔐 [SUPABASE] Signup error:', error)
-      return { error }
+      const errorMessage = handleAuthError(error)
+      return { success: false, error: errorMessage }
     }
   }
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string): Promise<AuthResult> => {
     try {
+      // Client-side validation
+      const validation = AuthValidator.validateSigninForm({ email, password })
+      if (!validation.valid) {
+        const firstError = Object.values(validation.errors)[0]
+        return { success: false, error: firstError }
+      }
+
+      // Rate limiting check
+      const clientId = email
+      if (!RateLimiter.checkRateLimit(clientId)) {
+        return { success: false, error: 'Rate limit exceeded' }
+      }
+
       console.log('🔐 [SUPABASE] Starting signin for:', email)
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.toLowerCase().trim(),
         password
       })
 
@@ -157,14 +203,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.log('🔐 [SUPABASE] Signin failed:', error.message)
-        return { error: new Error(error.message) }
+        const errorMessage = handleSupabaseError(error)
+        return { success: false, error: errorMessage }
       }
 
       console.log('🔐 [SUPABASE] Signin successful')
-      return { error: null }
+      return { success: true, user: data.user }
     } catch (error) {
       console.error('🔐 [SUPABASE] Signin error:', error)
-      return { error }
+      const errorMessage = handleAuthError(error)
+      return { success: false, error: errorMessage }
     }
   }
 
@@ -181,8 +229,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const signInWithWallet = async (walletAddress: string) => {
+  const signInWithWallet = async (walletAddress: string): Promise<AuthResult & { isNewUser?: boolean }> => {
     try {
+      // Validate wallet address
+      const validation = AuthValidator.validateWalletAddress(walletAddress)
+      if (!validation.valid) {
+        return { success: false, error: validation.error || 'Invalid wallet address' }
+      }
+
       console.log('🔐 [SUPABASE] Wallet signin for:', walletAddress)
       
       // Check if user exists with this wallet address
@@ -194,7 +248,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (fetchError && fetchError.code !== 'PGRST116') {
         console.error('🔐 [SUPABASE] Error checking existing user:', fetchError)
-        return { error: new Error('Failed to check existing user') }
+        return { success: false, error: 'Failed to check existing user' }
       }
 
       if (existingUser) {
@@ -209,15 +263,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           wallet_connected: true,
         }
         setUser(userData)
-        return { error: null, isNewUser: false }
+        return { success: true, user: userData, isNewUser: false }
       } else {
         // User doesn't exist, they need to sign up first
         console.log('🔐 [SUPABASE] No existing user found')
-        return { error: new Error('No account found with this wallet. Please sign up first.') }
+        return { success: false, error: 'No account found with this wallet. Please sign up first.' }
       }
     } catch (error) {
       console.error('🔐 [SUPABASE] Wallet signin error:', error)
-      return { error }
+      const errorMessage = handleAuthError(error)
+      return { success: false, error: errorMessage }
     }
   }
 
@@ -271,10 +326,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const updateProfile = async (updates: { name?: string; role?: string }) => {
+  const updateProfile = async (updates: { name?: string; role?: string }): Promise<AuthResult> => {
     try {
       if (!user) {
-        return { error: new Error('No user logged in') }
+        return { success: false, error: 'No user logged in' }
       }
 
       console.log('🔐 [SUPABASE] Updating profile:', updates)
@@ -285,16 +340,121 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.error('🔐 [SUPABASE] Profile update error:', error)
-        return { error: new Error(error.message) }
+        const errorMessage = handleSupabaseError(error)
+        return { success: false, error: errorMessage }
       }
 
       // Update local user state
       setUser(prev => prev ? { ...prev, ...updates } : null)
       console.log('🔐 [SUPABASE] Profile updated successfully')
-      return { error: null }
+      return { success: true, user: user }
     } catch (error) {
       console.error('🔐 [SUPABASE] Profile update error:', error)
-      return { error }
+      const errorMessage = handleAuthError(error)
+      return { success: false, error: errorMessage }
+    }
+  }
+
+  const refreshUser = async (): Promise<void> => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        await loadUserProfile(session.user)
+      }
+    } catch (error) {
+      console.error('🔐 [SUPABASE] Error refreshing user:', error)
+    }
+  }
+
+  const connectWallet = async (walletAddress: string): Promise<AuthResult> => {
+    try {
+      if (!user) {
+        return { success: false, error: 'No user logged in' }
+      }
+
+      // Validate wallet address
+      const validation = AuthValidator.validateWalletAddress(walletAddress)
+      if (!validation.valid) {
+        return { success: false, error: validation.error || 'Invalid wallet address' }
+      }
+
+      // Check if wallet is already connected to another user
+      const { data: existingWallet, error: fetchError } = await supabase
+        .from('profiles')
+        .select('id, email')
+        .eq('wallet_address', walletAddress)
+        .neq('id', user.id)
+        .single()
+
+      if (existingWallet) {
+        return { success: false, error: 'Wallet address already connected to another account' }
+      }
+
+      // Update user's wallet address
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          wallet_address: walletAddress,
+          wallet_connected: true,
+          wallet_connected_at: new Date().toISOString()
+        })
+        .eq('id', user.id)
+
+      if (error) {
+        console.error('🔐 [SUPABASE] Wallet connection error:', error)
+        const errorMessage = handleSupabaseError(error)
+        return { success: false, error: errorMessage }
+      }
+
+      // Update local user state
+      setUser(prev => prev ? { 
+        ...prev, 
+        wallet_address: walletAddress, 
+        wallet_connected: true 
+      } : null)
+
+      return { success: true, user: user }
+    } catch (error) {
+      console.error('🔐 [SUPABASE] Wallet connection error:', error)
+      const errorMessage = handleAuthError(error)
+      return { success: false, error: errorMessage }
+    }
+  }
+
+  const disconnectWallet = async (): Promise<AuthResult> => {
+    try {
+      if (!user) {
+        return { success: false, error: 'No user logged in' }
+      }
+
+      // Update user's wallet address
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          wallet_address: null,
+          wallet_connected: false,
+          wallet_connected_at: null
+        })
+        .eq('id', user.id)
+
+      if (error) {
+        console.error('🔐 [SUPABASE] Wallet disconnection error:', error)
+        const errorMessage = handleSupabaseError(error)
+        return { success: false, error: errorMessage }
+      }
+
+      // Update local user state
+      setUser(prev => prev ? { 
+        ...prev, 
+        wallet_address: null, 
+        wallet_connected: false 
+      } : null)
+
+      return { success: true, user: user }
+    } catch (error) {
+      console.error('🔐 [SUPABASE] Wallet disconnection error:', error)
+      const errorMessage = handleAuthError(error)
+      return { success: false, error: errorMessage }
     }
   }
 
@@ -309,6 +469,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signInWithWallet,
         signUpWithWallet,
         updateProfile,
+        refreshUser,
+        connectWallet,
+        disconnectWallet,
       }}
     >
       {children}

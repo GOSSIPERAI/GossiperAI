@@ -12,8 +12,8 @@ create table if not exists public.profiles (
   preferred_language text default 'en',
   created_at timestamp default now(),
   updated_at timestamp default now(),
-  is_active boolean default true,
-  password_hash text
+  is_active boolean default true
+ 
 );
 
 -- 2. Function to auto-create profile
