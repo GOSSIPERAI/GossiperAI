@@ -23,6 +23,7 @@ import {
   Maximize2,
   Minimize2,
   LogOut,
+  Wallet,
 } from "lucide-react"
 import Link from "next/link"
 import { useParams, useSearchParams, useRouter } from "next/navigation"
@@ -31,9 +32,10 @@ import { useAuth } from "@/hooks/use-auth"
 import { CaptionDisplay } from "@/components/caption-display"
 import { TranscriptionDisplay } from "@/components/transcription-display"
 import { PaymentModal } from "@/components/payment-modal"
-import { useSolana } from "@/hooks/use-solana"
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui"
+import { useBase } from "@/hooks/use-base"
 import { getSessionClient, getSessionParticipantsClient, type Session, type SessionParticipant } from "@/lib/session-service-client"
+import { toast } from "sonner"
+import { formatEther } from "ethers"
 
 const AVAILABLE_LANGUAGES = [
   { code: "en", name: "English" },
@@ -50,6 +52,21 @@ export default function SessionPage() {
   const sessionId = params.id as string
   const initialLang = searchParams.get("lang") || "en"
 
+  // Base blockchain hook
+  const {
+    isConnected,
+    address,
+    chainId,
+    isProcessing,
+    connectWallet,
+    disconnectWallet,
+    switchToBaseNetwork,
+    sendPayment,
+    createSession,
+    getSessionData,
+    getBalance,
+  } = useBase()
+
   const handleLogout = () => {
     signOut()
     router.push('/')
@@ -63,7 +80,8 @@ export default function SessionPage() {
   const [participants, setParticipants] = useState<SessionParticipant[]>([])
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
   const [isLoadingSession, setIsLoadingSession] = useState(true)
-  const { connected, publicKey } = useSolana()
+  const [walletBalance, setWalletBalance] = useState<string | null>(null)
+  const [blockchainSessionData, setBlockchainSessionData] = useState<any>(null)
 
   // Audio recording state
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
@@ -94,6 +112,48 @@ export default function SessionPage() {
       return () => clearTimeout(countdownTimer)
     }
   }, [recordingTimeRemaining])
+
+  // Load wallet balance when connected
+  useEffect(() => {
+    if (isConnected) {
+      const loadBalance = async () => {
+        const balance = await getBalance()
+        setWalletBalance(balance)
+      }
+      loadBalance()
+    } else {
+      setWalletBalance(null)
+    }
+  }, [isConnected, getBalance])
+
+  // Load blockchain session data and create session if needed
+  useEffect(() => {
+    if (isConnected && sessionId && sessionData) {
+      const loadBlockchainData = async () => {
+        const data = await getSessionData(sessionId)
+        if (data) {
+          setBlockchainSessionData(data)
+          console.log('Blockchain session data:', data)
+        } else {
+          // Session doesn't exist on blockchain, create it
+          console.log('Session not found on blockchain, creating...')
+          
+          // Default goal amount: 0.05 ETH (approximately $150-200 USD)
+          const goalAmount = 0.05
+          
+          const created = await createSession(sessionId, goalAmount)
+          if (created) {
+            // Reload blockchain data after creation
+            const newData = await getSessionData(sessionId)
+            if (newData) {
+              setBlockchainSessionData(newData)
+            }
+          }
+        }
+      }
+      loadBlockchainData()
+    }
+  }, [isConnected, sessionId, sessionData, getSessionData, createSession])
 
   // Load session data
   useEffect(() => {
@@ -154,7 +214,6 @@ export default function SessionPage() {
         
       } catch (error) {
         console.error('Error loading session data:', error)
-        // Keep existing mock data behavior on error
       } finally {
         setIsLoadingSession(false)
       }
@@ -165,23 +224,61 @@ export default function SessionPage() {
 
   const copyJoinCode = () => {
     navigator.clipboard.writeText(sessionData?.code || "")
+    toast.success("Join code copied to clipboard")
   }
 
   const shareSession = () => {
     const url = `${window.location.origin}/join-session?code=${sessionData?.code}`
     navigator.clipboard.writeText(url)
+    toast.success("Session link copied to clipboard")
   }
 
-  const handlePaymentSuccess = (amount: number) => {
-    // Update payment pool with new contribution
-    setSessionData((prev: any) => ({
-      ...prev,
-      paymentPool: {
-        ...prev.paymentPool,
-        currentAmount: prev.paymentPool.currentAmount + amount * 100 * 650, // Convert SOL to Naira cents (approx rate)
-        contributions: prev.paymentPool.contributions + 1,
-      },
-    }))
+  const handleConnectWallet = async () => {
+    const connected = await connectWallet()
+    if (connected) {
+      // Check if on Base network, if not switch
+      const BASE_SEPOLIA_CHAIN_ID = "0x14a34" // 84532 in hex
+      if (chainId !== BASE_SEPOLIA_CHAIN_ID) {
+        await switchToBaseNetwork("sepolia")
+      }
+    }
+  }
+
+  const handlePaymentSuccess = async (amount: number) => {
+    try {
+      // Send payment through smart contract
+      const result = await sendPayment({
+        amount,
+        sessionId,
+        description: `Contribution to ${sessionData?.title}`,
+      })
+
+      if (result) {
+        toast.success(`Payment successful! Transaction: ${result.transactionHash.slice(0, 10)}...`)
+        
+        // Reload blockchain session data to get updated amounts
+        const updatedData = await getSessionData(sessionId)
+        if (updatedData) {
+          setBlockchainSessionData(updatedData)
+        }
+
+        // Update local session data
+        setSessionData((prev: any) => ({
+          ...prev,
+          paymentPool: {
+            ...prev.paymentPool,
+            currentAmount: prev.paymentPool.currentAmount + amount * 100 * 650, // Convert ETH to Naira cents
+            contributions: prev.paymentPool.contributions + 1,
+          },
+        }))
+
+        // Refresh wallet balance
+        const newBalance = await getBalance()
+        setWalletBalance(newBalance)
+      }
+    } catch (error) {
+      console.error('Payment failed:', error)
+    }
   }
 
   // Audio recording functions
@@ -215,17 +312,16 @@ export default function SessionPage() {
         stream.getTracks().forEach(track => track.stop())
       }
       
-      recorder.start(5000) // Record in 5-second chunks
+      recorder.start(5000)
       setMediaRecorder(recorder)
       setIsRecording(true)
       
-      // Set 60-second auto-stop timer
       setRecordingTimeRemaining(60)
       const timer = setTimeout(() => {
         stopRecording()
         setIsMicOn(false)
         setRecordingTimeRemaining(0)
-      }, 60000) // 60 seconds
+      }, 60000)
       setRecordingTimer(timer)
       
     } catch (error) {
@@ -241,7 +337,6 @@ export default function SessionPage() {
       setMediaRecorder(null)
     }
     
-    // Clear the recording timer
     if (recordingTimer) {
       clearTimeout(recordingTimer)
       setRecordingTimer(null)
@@ -255,11 +350,9 @@ export default function SessionPage() {
       formData.append('audio', audioBlob, `recording_${Date.now()}.webm`)
       formData.append('callbackUrl', `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/api/transcription/callback`)
       formData.append('languageCode', selectedLanguage)
-      // Use proper UUID format for database compatibility
       const mockSessionId = sessionId === 'session_123' ? '550e8400-e29b-41d4-a716-446655440000' : sessionId
-      formData.append('sessionId', mockSessionId) // Add session ID to the request
+      formData.append('sessionId', mockSessionId)
 
-      // Use the existing transcription service
       const response = await fetch('/api/transcription/transcribe', {
         method: 'POST',
         body: formData,
@@ -278,7 +371,6 @@ export default function SessionPage() {
     }
   }
 
-  // Handle mic toggle
   const handleMicToggle = () => {
     if (isMicOn) {
       stopRecording()
@@ -329,6 +421,12 @@ export default function SessionPage() {
                   <Badge variant={user?.role === "lecturer" ? "default" : "outline"} className="text-xs">
                     {user?.role === "lecturer" ? "Lecturer" : "Student"}
                   </Badge>
+                  {isConnected && (
+                    <Badge variant="outline" className="flex items-center space-x-1">
+                      <Wallet className="h-3 w-3" />
+                      <span>{address?.slice(0, 6)}...{address?.slice(-4)}</span>
+                    </Badge>
+                  )}
                   <Button variant="outline" size="icon" onClick={handleLogout} title="Logout">
                     <LogOut className="h-4 w-4" />
                   </Button>
@@ -458,6 +556,20 @@ export default function SessionPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
+                    {/* Blockchain Session Info */}
+                    {blockchainSessionData && (
+                      <div className="p-2 bg-blue-50 border border-blue-200 rounded text-xs space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-blue-600">On-chain Amount:</span>
+                          <span className="font-medium">{formatEther(blockchainSessionData.currentAmount)} ETH</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-blue-600">Contributors:</span>
+                          <span className="font-medium">{blockchainSessionData.contributionCount.toString()}</span>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span>Progress</span>
@@ -477,18 +589,44 @@ export default function SessionPage() {
                         : `Help fund this session with ${sessionData.paymentPool?.contributions || 0} other students`
                       }
                     </p>
-                    {user?.role === "student" && (
-                      connected ? (
-                        <Button size="sm" className="w-full" onClick={() => setIsPaymentModalOpen(true)}>
-                          Contribute with SOL
-                        </Button>
-                      ) : (
-                        <div className="space-y-2">
-                          <p className="text-xs text-muted-foreground text-center">Connect wallet to contribute</p>
-                          <WalletMultiButton className="!w-full !bg-primary hover:!bg-primary/90 !text-primary-foreground !text-sm !py-2 !px-4 !rounded-md" />
-                        </div>
-                      )
+
+                    {/* Wallet Info */}
+                    {isConnected && walletBalance && (
+                      <div className="text-xs text-muted-foreground">
+                        Balance: {parseFloat(walletBalance).toFixed(4)} ETH
+                      </div>
                     )}
+
+                    {user?.role === "student" && (
+                      <>
+                        {!isConnected ? (
+                          <Button size="sm" className="w-full" onClick={handleConnectWallet}>
+                            <Wallet className="h-4 w-4 mr-2" />
+                            Connect Wallet
+                          </Button>
+                        ) : (
+                          <div className="space-y-2">
+                            <Button 
+                              size="sm" 
+                              className="w-full" 
+                              onClick={() => setIsPaymentModalOpen(true)}
+                              disabled={isProcessing}
+                            >
+                              {isProcessing ? "Processing..." : "Contribute with ETH"}
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="w-full" 
+                              onClick={disconnectWallet}
+                            >
+                              Disconnect Wallet
+                            </Button>
+                          </div>
+                        )}
+                      </>
+                    )}
+
                     {user?.role === "lecturer" && (
                       <div className="text-center">
                         <p className="text-xs text-muted-foreground">

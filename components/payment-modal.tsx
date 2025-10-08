@@ -1,13 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { useSolana } from "@/hooks/use-solana"
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui"
+import { useBase } from "@/hooks/use-base"
 import { Wallet, CreditCard, Zap } from "lucide-react"
 
 interface PaymentModalProps {
@@ -19,8 +18,9 @@ interface PaymentModalProps {
 }
 
 export function PaymentModal({ isOpen, onClose, sessionId, sessionTitle, onPaymentSuccess }: PaymentModalProps) {
-  const [amount, setAmount] = useState("0.01")
-  const { sendPayment, isProcessing, connected, publicKey } = useSolana()
+  const [amount, setAmount] = useState("0.001")
+  const { sendPayment, isProcessing, isConnected, address, connectWallet, getBalance } = useBase()
+  const [walletBalance, setWalletBalance] = useState<string | null>(null)
 
   const handlePayment = async () => {
     const paymentAmount = Number.parseFloat(amount)
@@ -28,18 +28,33 @@ export function PaymentModal({ isOpen, onClose, sessionId, sessionTitle, onPayme
 
     const result = await sendPayment({
       amount: paymentAmount,
-      recipient: "GossipPoolAddress123456789", // This would be the actual pool address
       sessionId,
-      description: `Payment for session: ${sessionTitle}`,
+      description: `Contribution to ${sessionTitle}`,
     })
 
     if (result) {
       onPaymentSuccess(paymentAmount)
+      // Refresh balance
+      const newBalance = await getBalance()
+      if (newBalance) setWalletBalance(newBalance)
       onClose()
     }
   }
 
-  const presetAmounts = [0.01, 0.05, 0.1, 0.25]
+  const presetAmounts = [0.001, 0.005, 0.01, 0.05]
+
+  // Load wallet balance when connected
+  useEffect(() => {
+    if (isConnected) {
+      const loadBalance = async () => {
+        const balance = await getBalance()
+        if (balance) setWalletBalance(balance)
+      }
+      loadBalance()
+    } else {
+      setWalletBalance(null)
+    }
+  }, [isConnected, getBalance])
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -62,30 +77,38 @@ export function PaymentModal({ isOpen, onClose, sessionId, sessionTitle, onPayme
             <p className="mt-1">Your contribution helps fund AI captioning and translation services.</p>
           </div>
 
-          {!connected ? (
+          {!isConnected ? (
             <div className="text-center space-y-4">
               <div className="flex items-center justify-center w-16 h-16 mx-auto bg-primary/10 rounded-full">
                 <Wallet className="h-8 w-8 text-primary" />
               </div>
               <div>
                 <h3 className="font-medium">Connect Your Wallet</h3>
-                <p className="text-sm text-muted-foreground mt-1">Connect your Solana wallet to make payments</p>
+                <p className="text-sm text-muted-foreground mt-1">Connect your wallet to make payments on Base network</p>
               </div>
-              <WalletMultiButton className="!bg-primary hover:!bg-primary/90" />
+              <Button onClick={connectWallet} className="w-full">
+                <Wallet className="h-4 w-4 mr-2" />
+                Connect Wallet
+              </Button>
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="p-3 bg-muted/50 rounded-lg">
+              <div className="p-3 bg-muted/50 rounded-lg space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <div className="w-2 h-2 bg-green-500 rounded-full" />
                   <span>
-                    Connected: {publicKey?.slice(0, 8)}...{publicKey?.slice(-8)}
+                    Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
                   </span>
                 </div>
+                {walletBalance && (
+                  <div className="text-xs text-muted-foreground">
+                    Balance: {parseFloat(walletBalance).toFixed(4)} ETH
+                  </div>
+                )}
               </div>
 
               <div className="space-y-3">
-                <Label htmlFor="amount">Payment Amount (SOL)</Label>
+                <Label htmlFor="amount">Payment Amount (ETH)</Label>
                 <div className="flex gap-2">
                   {presetAmounts.map((preset) => (
                     <Button
@@ -95,7 +118,7 @@ export function PaymentModal({ isOpen, onClose, sessionId, sessionTitle, onPayme
                       onClick={() => setAmount(preset.toString())}
                       className="flex-1"
                     >
-                      {preset} SOL
+                      {preset} ETH
                     </Button>
                   ))}
                 </div>
@@ -113,8 +136,13 @@ export function PaymentModal({ isOpen, onClose, sessionId, sessionTitle, onPayme
               <Separator />
 
               <div className="flex items-center justify-between text-sm">
-                <span>Network Fee:</span>
-                <span className="text-muted-foreground">~0.000005 SOL</span>
+                <span>Network:</span>
+                <span className="text-muted-foreground">Base Sepolia</span>
+              </div>
+
+              <div className="flex items-center justify-between text-sm">
+                <span>Estimated Gas:</span>
+                <span className="text-muted-foreground">~0.0001 ETH</span>
               </div>
 
               <Button
@@ -131,7 +159,7 @@ export function PaymentModal({ isOpen, onClose, sessionId, sessionTitle, onPayme
                 ) : (
                   <>
                     <CreditCard className="w-4 h-4 mr-2" />
-                    Pay {amount} SOL
+                    Pay {amount} ETH
                   </>
                 )}
               </Button>
