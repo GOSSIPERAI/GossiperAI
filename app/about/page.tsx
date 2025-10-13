@@ -5,12 +5,16 @@ import { Heart, Users, Globe, Target, ArrowRight, Award, TrendingUp } from "luci
 import Link from "next/link"
 import { MainNavigation } from "@/components/main-navigation"
 
+const founder = `Agbaje Omobobola Melody`;
+
 const team = [
   {
-    name: "Dr. Adebayo Ogundimu",
+    name: "Agbaje Omobobola Melody",
     role: "Founder & CEO",
-    bio: "Former accessibility researcher at University of Lagos with 10+ years in educational technology.",
-    image: "/professional-headshot-of-dr--adebayo-ogundimu.jpg",
+    bio: 
+    `Melody is a teacher who is passionate about growth, education, and creating spaces where every voice is heard.
+     Her work reflects humility, purpose, and a deep belief in the power of connection.`,
+    image: "/Melody.jpg",
   },
   {
     name: "Sarah Chen",
@@ -49,7 +53,7 @@ export default function AboutPage() {
               Breaking Down <span className="text-primary">Language Barriers</span> in Education
             </h1>
             <p className="text-xl text-muted-foreground text-pretty">
-              Founded in Lagos, Nigeria, Gossiper was born from a simple belief: every student deserves equal access to
+              Gossiper was born from a simple belief: every student deserves equal access to
               education, regardless of their hearing ability or native language.
             </p>
           </div>
@@ -82,9 +86,9 @@ export default function AboutPage() {
                   <h3 className="text-xl font-semibold">Why We Started</h3>
                 </div>
                 <p className="text-muted-foreground">
-                  Our founder, Dr. Adebayo Ogundimu, witnessed firsthand how language barriers and hearing difficulties
+                 ` Our founder, {founder}, witnessed firsthand how language barriers and hearing difficulties
                   prevented brilliant students from reaching their full potential. Traditional solutions were expensive,
-                  slow, and often unavailable in developing regions.
+                  slow, and often unavailable in developing regions.`
                 </p>
               </div>
 
@@ -258,7 +262,7 @@ export default function AboutPage() {
                 working toward universal educational access.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
+                <Button size="lg" variant="secondary" className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white" asChild>
                   <Link href="/signup">
                     Get Started Today
                     <ArrowRight className="ml-2 h-5 w-5" />
