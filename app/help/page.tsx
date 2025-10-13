@@ -13,7 +13,7 @@ const categories = [
     icon: BookOpen,
     articles: [
       "How to join your first session",
-      "Setting up your Solana wallet",
+      "Setting up your Base wallet",
       "Choosing your preferred language",
       "Understanding class pools",
     ],
@@ -60,7 +60,7 @@ const popularArticles = [
     readTime: "2 min read",
   },
   {
-    title: "Setting up your Solana wallet for payments",
+    title: "Setting up your Base wallet for payments",
     category: "Payments",
     readTime: "5 min read",
   },
@@ -91,7 +91,7 @@ export default function HelpPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-8 max-w-4xl mx-auto">
             <Badge variant="secondary" className="w-fit mx-auto">
-              Help Center
+              Help Centre
             </Badge>
             <h1 className="text-4xl lg:text-6xl font-bold text-balance">
               How can we <span className="text-primary">help you</span> today?
