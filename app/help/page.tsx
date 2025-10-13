@@ -254,7 +254,7 @@ export default function HelpPage() {
                 education experts.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white" asChild>
+                <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
                   <Link href="/contact">
                     Contact Support
                     <ArrowRight className="ml-2 h-5 w-5" />

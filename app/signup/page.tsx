@@ -162,7 +162,7 @@ export default function SignupPage() {
             {/* Wallet Signup - Simplified */}
             <div className="space-y-3">
               <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-3">Sign up with your wallet</p>
+                <p className="text-sm text-muted-foreground mb-3">Sign up with your Solana wallet</p>
                 {isWalletLoading ? (
                   <Button disabled className="w-full">
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
