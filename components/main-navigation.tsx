@@ -87,7 +87,7 @@ export function MainNavigation() {
                 <Button variant="outline" asChild>
                   <Link href="/login">Sign In</Link>
                 </Button>
-                <Button asChild>
+                <Button className="hover:bg-black" asChild>
                   <Link href="/signup">Get Started</Link>
                 </Button>
               </>
