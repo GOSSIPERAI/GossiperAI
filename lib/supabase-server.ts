@@ -5,30 +5,33 @@ import { cookies } from "next/headers";
 
 // Use environment variables for better security
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseServiceKey) {
+if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables')
 }
 
 export const createServerSupabaseClient = () => {
   return createServerClient(
     supabaseUrl,
-    supabaseServiceKey,
+    supabaseAnonKey,
     {
       cookies: {
-        getAll() {
-          return cookies().getAll();
+        get(name: string) {
+          return cookies().get(name)?.value
         },
-        setAll(cookiesToSet: { name: string, value: string, options: CookieOptions }[]) {
+        set(name: string, value: string, options: CookieOptions) {
           try {
-            cookiesToSet.forEach(({ name, value, options }: { name: string, value: string, options: CookieOptions }) =>
-              cookies().set(name, value, options)
-            );
+            cookies().set(name, value, options)
           } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
+            // set called from Server Component without a mutable cookies store
+          }
+        },
+        remove(name: string, options: CookieOptions) {
+          try {
+            cookies().set(name, '', options)
+          } catch {
+            // remove called from Server Component without a mutable cookies store
           }
         },
       },

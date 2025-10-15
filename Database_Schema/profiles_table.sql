@@ -1,0 +1,89 @@
+-- Usinng Supaabse Trigger auto create profiles after user signup
+-- DEFAULT Trigger setup, more columns can be added later 
+-- 1. Ensure your profiles table exists
+
+create table if not exists public.profiles (
+  id uuid references auth.users(id) on delete cascade primary key,
+  email text,
+  full_name text,
+  role text check (role in ('lecturer','student')),
+  wallet_address text,
+  wallet_connected boolean default false,
+  preferred_language text default 'en',
+  created_at timestamp default now(),
+  updated_at timestamp default now(),
+  is_active boolean default true
+ 
+);
+
+-- 2. Function to auto-create profile
+-- Update trigger function to include email & metadata
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email,full_name, role, password_hash )
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', 'Unnamed User'),
+    COALESCE(NEW.raw_user_meta_data->>'role','student'),
+    NEW.password_hash
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Recreate trigger
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+AFTER INSERT ON auth.users
+FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+
+
+
+
+--Ignore RLS for now
+-- Enable RLS
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+-- Drop old policies if they exist
+DROP POLICY IF EXISTS "Users can insert their own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can view their own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can update their own profile" ON profiles;
+
+--  Allow inserting profile only if user matches auth.users and has no profile yet
+CREATE POLICY "Allow profile creation during signup"
+ON profiles
+FOR INSERT WITH CHECK (
+  auth.uid() = id
+  AND NOT EXISTS (
+    SELECT 1 FROM profiles p WHERE p.id = id
+  )
+);
+
+{-- Drop existing broken policy (if present) 
+DROP POLICY IF EXISTS "Allow profile creation during signup"
+ ON public.profiles;
+-- Create corrected 
+INSERT policy allowing signup-created profiles 
+REATE POLICY "Allow profile creation during signup" 
+ON public.profiles 
+FOR INSERT TO public 
+WITH CHECK ( (
+  SELECT auth.uid()) = id 
+  AND NOT EXISTS ( 
+    SELECT 1 FROM public.profiles p WHERE p.id = id ) );
+}
+
+
+--  Users can only select (read) their own profile
+CREATE POLICY "Users can view their own profile"
+ON profiles
+FOR SELECT USING (auth.uid() = id);
+
+--  Users can only update their own profile
+CREATE POLICY "Users can update their own profile"
+ON profiles
+FOR UPDATE USING (auth.uid() = id);
+

@@ -31,7 +31,7 @@ After analyzing the Template codebase and comparing it with the current Gossiper
 ### 1. Enhanced Authentication Architecture
 
 #### 1.1 Unified Authentication System
-```typescript
+\`\`\`typescript
 // Enhanced User Interface
 interface User {
   id: string
@@ -66,10 +66,10 @@ interface AuthResult {
   error?: string
   user?: User
 }
-```
+\`\`\`
 
 #### 1.2 Enhanced Validation System
-```typescript
+\`\`\`typescript
 // lib/auth-validation.ts
 export class AuthValidator {
   static validateEmail(email: string): ValidationResult {
@@ -113,12 +113,12 @@ export class AuthValidator {
     }
   }
 }
-```
+\`\`\`
 
 ### 2. Enhanced Security Features
 
 #### 2.1 Improved Password Security
-```typescript
+\`\`\`typescript
 // lib/auth-security.ts
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
@@ -156,10 +156,10 @@ export class AuthSecurity {
     }
   }
 }
-```
+\`\`\`
 
 #### 2.2 Rate Limiting and Security Headers
-```typescript
+\`\`\`typescript
 // lib/rate-limiter.ts
 export class RateLimiter {
   private static attempts = new Map<string, { count: number; resetTime: number }>()
@@ -187,12 +187,12 @@ export class RateLimiter {
     this.attempts.delete(identifier)
   }
 }
-```
+\`\`\`
 
 ### 3. Enhanced Database Schema
 
 #### 3.1 Improved User Table
-```sql
+\`\`\`sql
 -- Enhanced users table with better constraints and indexes
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -238,12 +238,12 @@ CREATE TABLE user_sessions (
 CREATE INDEX idx_user_sessions_user_id ON user_sessions(user_id);
 CREATE INDEX idx_user_sessions_token_hash ON user_sessions(token_hash);
 CREATE INDEX idx_user_sessions_expires_at ON user_sessions(expires_at);
-```
+\`\`\`
 
 ### 4. Enhanced API Endpoints
 
 #### 4.1 Improved Signup Endpoint
-```typescript
+\`\`\`typescript
 // app/api/auth/signup/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { AuthValidator } from '@/lib/auth-validation'
@@ -379,10 +379,10 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-```
+\`\`\`
 
 #### 4.2 Enhanced Signin Endpoint
-```typescript
+\`\`\`typescript
 // app/api/auth/signin/route.ts
 export async function POST(request: NextRequest) {
   try {
@@ -485,12 +485,12 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-```
+\`\`\`
 
 ### 5. Enhanced Frontend Components
 
 #### 5.1 Improved Login Page
-```typescript
+\`\`\`typescript
 // app/login/page.tsx - Enhanced version
 "use client"
 
@@ -720,12 +720,12 @@ export default function LoginPage() {
     </div>
   )
 }
-```
+\`\`\`
 
 ### 6. Enhanced Middleware
 
 #### 6.1 Improved Route Protection
-```typescript
+\`\`\`typescript
 // middleware.ts
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
@@ -778,12 +778,12 @@ export const config = {
     '/api/transcription/:path*'
   ],
 }
-```
+\`\`\`
 
 ### 7. Additional Security Features
 
 #### 7.1 Email Verification
-```typescript
+\`\`\`typescript
 // app/api/auth/verify-email/route.ts
 export async function POST(request: NextRequest) {
   try {
@@ -807,10 +807,10 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-```
+\`\`\`
 
 #### 7.2 Password Reset
-```typescript
+\`\`\`typescript
 // app/api/auth/reset-password/route.ts
 export async function POST(request: NextRequest) {
   try {
@@ -836,7 +836,7 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-```
+\`\`\`
 
 ## 🎯 Implementation Plan
 

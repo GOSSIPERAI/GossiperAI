@@ -100,5 +100,3 @@ export function useAuthLegacy() {
     setUserRole, // Add this for testing
   }
 }
-
-
