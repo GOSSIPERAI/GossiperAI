@@ -1,11 +1,18 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { SecurityHeaders } from '@/lib/auth-security'
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
+  })
+
+  // Add security headers
+  const securityHeaders = SecurityHeaders.getSecurityHeaders()
+  Object.entries(securityHeaders).forEach(([key, value]) => {
+    response.headers.set(key, value)
   })
 
   const supabase = createServerClient(
@@ -61,28 +68,58 @@ export async function middleware(request: NextRequest) {
   console.log('🛡️ [MIDDLEWARE] Checking auth for:', request.nextUrl.pathname)
   console.log('🛡️ [MIDDLEWARE] User authenticated:', !!user)
 
-  // Check if user should be redirected to login
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/signup') &&
-    !request.nextUrl.pathname.startsWith('/forgot-password') &&
-    !request.nextUrl.pathname.startsWith('/auth') &&
-    !request.nextUrl.pathname.startsWith('/api') &&
-    request.nextUrl.pathname !== '/' &&
-    request.nextUrl.pathname !== '/features' &&
-    request.nextUrl.pathname !== '/pricing' &&
-    request.nextUrl.pathname !== '/about' &&
-    request.nextUrl.pathname !== '/help' &&
-    request.nextUrl.pathname !== '/contact' &&
-    request.nextUrl.pathname !== '/privacy' &&
-    request.nextUrl.pathname !== '/terms'
-  ) {
+  // Public routes that don't require authentication
+  const publicRoutes = [
+    '/login',
+    '/signup', 
+    '/forgot-password',
+    '/auth',
+    '/api',
+    '/',
+    '/features',
+    '/pricing',
+    '/about',
+    '/help',
+    '/contact',
+    '/privacy',
+    '/terms'
+  ]
+
+  // Check if route is public
+  const isPublicRoute = publicRoutes.some(route => 
+    request.nextUrl.pathname.startsWith(route)
+  )
+
+  // If user is not authenticated and trying to access protected route
+  if (!user && !isPublicRoute) {
     console.log('🛡️ [MIDDLEWARE] No user found, redirecting to login')
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('redirect', request.nextUrl.pathname)
     return NextResponse.redirect(url)
+  }
+
+  // If user is authenticated, add user info to headers for API routes
+  if (user && request.nextUrl.pathname.startsWith('/api')) {
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('x-user-id', user.id)
+    requestHeaders.set('x-user-email', user.email || '')
+    requestHeaders.set('x-user-role', user.user_metadata?.role || 'student')
+    
+    response = NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    })
+  }
+
+  // Role-based access control for specific routes
+  if (user && request.nextUrl.pathname.startsWith('/create-session')) {
+    const userRole = user.user_metadata?.role || 'student'
+    if (userRole !== 'lecturer' && userRole !== 'admin') {
+      console.log('🛡️ [MIDDLEWARE] Insufficient permissions for create-session')
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
   }
 
   return response

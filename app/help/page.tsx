@@ -13,7 +13,7 @@ const categories = [
     icon: BookOpen,
     articles: [
       "How to join your first session",
-      "Setting up your Solana wallet",
+      "Setting up your Base wallet",
       "Choosing your preferred language",
       "Understanding class pools",
     ],
@@ -60,7 +60,7 @@ const popularArticles = [
     readTime: "2 min read",
   },
   {
-    title: "Setting up your Solana wallet for payments",
+    title: "Setting up your Base wallet for payments",
     category: "Payments",
     readTime: "5 min read",
   },
@@ -108,7 +108,7 @@ export default function HelpPage() {
                   placeholder="Search for help articles, guides, and tutorials..."
                   className="pl-12 h-14 text-lg"
                 />
-                <Button className="absolute right-2 top-2 h-10">Search</Button>
+                <Button className="absolute right-2 top-2 h-10 hover:bg-black">Search</Button>
               </div>
             </div>
           </div>
@@ -254,7 +254,7 @@ export default function HelpPage() {
                 education experts.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
+                <Button size="lg" variant="secondary" className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white" asChild>
                   <Link href="/contact">
                     Contact Support
                     <ArrowRight className="ml-2 h-5 w-5" />

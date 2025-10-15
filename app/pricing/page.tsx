@@ -79,7 +79,7 @@ export default function PricingPage() {
               Accessible Education for <span className="text-primary">Everyone</span>
             </h1>
             <p className="text-xl text-muted-foreground text-pretty">
-              Fair, transparent pricing powered by Solana Pay. Students contribute as little as ₦50 per session, while
+              Fair, transparent pricing powered by Base Pay. Students contribute as little as ₦50 per session, while
               educators get powerful tools to make their content accessible.
             </p>
           </div>
@@ -143,7 +143,7 @@ export default function PricingPage() {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-balance">How Solana Pay Works</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold text-balance">How Base Pay Works</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-pretty">
               Fast, secure, and affordable payments powered by blockchain technology.
             </p>
@@ -156,7 +156,7 @@ export default function PricingPage() {
               </div>
               <h3 className="text-xl font-semibold">Connect Wallet</h3>
               <p className="text-muted-foreground">
-                Connect your Solana wallet (Phantom, Solflare, etc.) to get started. No credit card required.
+                Connect your Base wallet (Phantom, Solflare, etc.) to get started. No credit card required.
               </p>
             </div>
 
@@ -192,9 +192,9 @@ export default function PricingPage() {
 
           <div className="max-w-3xl mx-auto space-y-8">
             <div className="space-y-4">
-              <h3 className="text-xl font-semibold">Why use Solana Pay instead of traditional payments?</h3>
+              <h3 className="text-xl font-semibold">Why use Base Pay instead of traditional payments?</h3>
               <p className="text-muted-foreground">
-                Solana Pay offers near-zero transaction fees (less than $0.001), instant settlement, and global
+                Base Pay offers near-zero transaction fees (less than $0.001), instant settlement, and global
                 accessibility. This makes micro-payments viable for students worldwide.
               </p>
             </div>
@@ -238,7 +238,7 @@ export default function PricingPage() {
                 Join thousands of students and educators making education accessible for everyone.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
+                <Button size="lg" variant="secondary" className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white" asChild>
                   <Link href="/signup">
                     Start Free Trial
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -262,7 +262,7 @@ export default function PricingPage() {
       <footer className="border-t border-border bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center text-muted-foreground">
-            <p>&copy; 2024 Gossiper. All rights reserved. Powered by Solana.</p>
+            <p>&copy; 2024 Gossiper. All rights reserved. Powered by Base.</p>
           </div>
         </div>
       </footer>
