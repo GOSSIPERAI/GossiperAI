@@ -111,9 +111,7 @@ export default function LoginPage() {
       if (error) {
         setError(error.message || "Invalid credentials. Please try again.")
       } else {
-        // Auth state change will be handled by the auth hook
-        const redirect = searchParams.get('redirect') || getDefaultRedirect('student')
-        router.replace(redirect)
+        // Auth state change and redirect are handled by the AuthProvider's user effect
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.")

@@ -32,7 +32,7 @@ After analyzing both the Template and GossiperAI codebases, I've identified sign
 ### 1. Enhanced AssemblyAI Integration
 
 #### 1.1 Advanced AssemblyAI Features
-```typescript
+\`\`\`typescript
 // Enhanced AssemblyAI service with advanced features
 export class EnhancedAssemblyAIService {
   private static client: AssemblyAI
@@ -86,10 +86,10 @@ export class EnhancedAssemblyAIService {
     return this.mapToTranscriptionResult(transcript)
   }
 }
-```
+\`\`\`
 
 #### 1.2 Real-time Transcription Support
-```typescript
+\`\`\`typescript
 // Real-time transcription with WebSocket support
 export class RealTimeTranscriptionService {
   private ws: WebSocket | null = null
@@ -169,12 +169,12 @@ export class RealTimeTranscriptionService {
     }
   }
 }
-```
+\`\`\`
 
 ### 2. Enhanced Database Schema
 
 #### 2.1 Comprehensive Transcription Tables
-```sql
+\`\`\`sql
 -- Enhanced transcriptions table
 CREATE TABLE transcriptions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -238,10 +238,10 @@ CREATE INDEX idx_transcriptions_status ON transcriptions(status);
 CREATE INDEX idx_transcriptions_created_at ON transcriptions(created_at);
 CREATE INDEX idx_transcription_segments_transcription_id ON transcription_segments(transcription_id);
 CREATE INDEX idx_transcription_segments_start_time ON transcription_segments(start_time_ms);
-```
+\`\`\`
 
 #### 2.2 Enhanced Types
-```typescript
+\`\`\`typescript
 // Enhanced transcription types
 export interface TranscriptionOptions {
   callbackUrl: string
@@ -349,12 +349,12 @@ export interface Summarization {
   actionItems: string[]
   confidence: number
 }
-```
+\`\`\`
 
 ### 3. Advanced Transcription Features
 
 #### 3.1 Multi-language Support
-```typescript
+\`\`\`typescript
 // Enhanced multi-language transcription
 export class MultiLanguageTranscriptionService {
   static async transcribeWithMultipleLanguages(
@@ -392,10 +392,10 @@ export class MultiLanguageTranscriptionService {
     }
   }
 }
-```
+\`\`\`
 
 #### 3.2 Transcription Quality Metrics
-```typescript
+\`\`\`typescript
 // Transcription quality analysis
 export class TranscriptionQualityAnalyzer {
   static analyzeQuality(transcription: TranscriptionResult): QualityMetrics {
@@ -434,12 +434,12 @@ export class TranscriptionQualityAnalyzer {
     }
   }
 }
-```
+\`\`\`
 
 ### 4. Enhanced UI Components
 
 #### 4.1 Advanced Transcription Display
-```typescript
+\`\`\`typescript
 // Enhanced transcription display component
 export function EnhancedTranscriptionDisplay({
   sessionId,
@@ -634,10 +634,10 @@ export function EnhancedTranscriptionDisplay({
     </div>
   )
 }
-```
+\`\`\`
 
 #### 4.2 Real-time Transcription Controls
-```typescript
+\`\`\`typescript
 // Real-time transcription controls
 export function RealTimeTranscriptionControls({
   sessionId,
@@ -788,12 +788,12 @@ export function RealTimeTranscriptionControls({
     </div>
   )
 }
-```
+\`\`\`
 
 ### 5. Enhanced API Endpoints
 
 #### 5.1 Advanced Transcription API
-```typescript
+\`\`\`typescript
 // Enhanced transcription API endpoints
 export class TranscriptionAPI {
   // Submit transcription with advanced options
@@ -879,10 +879,10 @@ export class TranscriptionAPI {
     }
   }
 }
-```
+\`\`\`
 
 #### 5.2 Real-time Transcription API
-```typescript
+\`\`\`typescript
 // Real-time transcription API
 export class RealTimeTranscriptionAPI {
   // Start real-time transcription
@@ -938,7 +938,7 @@ export class RealTimeTranscriptionAPI {
     }
   }
 }
-```
+\`\`\`
 
 ### 6. Implementation Roadmap
 
