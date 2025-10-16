@@ -72,7 +72,7 @@ export default function HomePage() {
                   </div>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>12 students connected</span>
-                    {/* <span>₦50 pool goal: 80% funded</span> */}
+                    <span>₦50 pool goal: 80% funded</span>
                   </div>
                 </div>
               </div>
