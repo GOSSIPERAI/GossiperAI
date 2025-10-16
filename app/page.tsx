@@ -29,7 +29,7 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="text-lg px-8 hover:bg-black transition-all" asChild>
+                <Button size="lg" className="text-lg px-8 hover:bg-black" asChild>
                   <Link href="/join-session">
                     Join a Session
                     <ArrowRight className="ml-2 h-5 w-5" />

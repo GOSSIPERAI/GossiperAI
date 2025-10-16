@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "Enhance classroom accessibility with AI-powered real-time captioning and translation. Supporting deaf, hard-of-hearing, and international students.",
   generator: "v0.app",
   keywords: ["AI captions", "real-time translation", "accessibility", "education", "Solana Pay"],
-  icons : "/gossiper-logo-white.png"
+  icons:"/gossiper-logo-white.png",
 }
 
 export default function RootLayout({

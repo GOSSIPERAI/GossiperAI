@@ -91,7 +91,7 @@ export default function HelpPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-8 max-w-4xl mx-auto">
             <Badge variant="secondary" className="w-fit mx-auto">
-              Help Centre
+              Help Center
             </Badge>
             <h1 className="text-4xl lg:text-6xl font-bold text-balance">
               How can we <span className="text-primary">help you</span> today?
@@ -108,7 +108,7 @@ export default function HelpPage() {
                   placeholder="Search for help articles, guides, and tutorials..."
                   className="pl-12 h-14 text-lg"
                 />
-                <Button className="absolute right-2 top-2 h-10">Search</Button>
+                <Button className="absolute right-2 top-2 h-10 hover:bg-black">Search</Button>
               </div>
             </div>
           </div>

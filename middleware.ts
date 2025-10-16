@@ -73,6 +73,7 @@ export async function middleware(request: NextRequest) {
     '/login',
     '/signup', 
     '/forgot-password',
+    '/auth/callback', //added this
     '/auth',
     '/api',
     '/',
@@ -89,6 +90,24 @@ export async function middleware(request: NextRequest) {
   const isPublicRoute = publicRoutes.some(route => 
     request.nextUrl.pathname.startsWith(route)
   )
+
+  /* If user is authenticated and trying to access auth pages, redirect to dashboard
+  if (user && (request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup'))) {
+    const role = (user.user_metadata?.role as 'student' | 'lecturer' | 'admin') || 'student'
+    const redirect = role === 'lecturer' ? '/dashboard?role=lecturer' : role === 'admin' ? '/dashboard?role=admin' : '/dashboard?role=student'
+    return NextResponse.redirect(new URL(redirect, request.url))
+  }*/
+
+    // If user is authenticated and trying to access auth pages, redirect to dashboard
+// BUT: Don't redirect if it's a POST request (form submission in progress)
+if (user && 
+    (request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup')) &&
+    request.method === 'GET') {
+  const role = (user.user_metadata?.role as 'student' | 'lecturer' | 'admin') || 'student'
+  const redirect = role === 'lecturer' ? '/dashboard?role=lecturer' : role === 'admin' ? '/dashboard?role=admin' : '/dashboard?role=student'
+  return NextResponse.redirect(new URL(redirect, request.url))
+}
+
 
   // If user is not authenticated and trying to access protected route
   if (!user && !isPublicRoute) {

@@ -5,10 +5,10 @@ import { createClient } from '@/lib/supabase-client'
 import { AuthValidator } from '@/lib/auth-validation'
 import { RateLimiter } from '@/lib/auth-security'
 import { handleAuthError, handleSupabaseError } from '@/lib/auth-error-handler'
-import { validateSession, type User, type AuthResult } from '@/lib/auth-utils'
+import type { AuthResult } from '@/lib/auth-utils'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 
-interface User {
+interface AuthUser {
   id: string
   email?: string
   full_name: string
@@ -18,7 +18,7 @@ interface User {
 }
 
 interface AuthContextType {
-  user: User | null
+  user: AuthUser | null
   isLoading: boolean
   signUp: (email: string, password: string, userData: { name: string; role: 'student' | 'lecturer' }) => Promise<AuthResult>
   signIn: (email: string, password: string) => Promise<AuthResult>
@@ -46,7 +46,7 @@ const AuthContext = createContext<AuthContextType>({
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<AuthUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const supabase = createClient()
 
@@ -111,7 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       console.log('🔐 [SUPABASE] Profile loaded:', profile)
       
-      const userData: User = {
+      const userData: AuthUser = {
         id: profile.id,
         email: profile.email,
         full_name: profile.name || profile.full_name || supabaseUser.user_metadata?.full_name || 'User',
@@ -208,6 +208,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       console.log('🔐 [SUPABASE] Signin successful')
+      // Immediately load profile and set user to avoid race with onAuthStateChange
+      if (data.user) {
+        await loadUserProfile(data.user)
+      }
       return { success: true, user: data.user }
     } catch (error) {
       console.error('🔐 [SUPABASE] Signin error:', error)
@@ -254,7 +258,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (existingUser) {
         // User exists, sign them in
         console.log('🔐 [SUPABASE] Existing user found, signing in')
-        const userData: User = {
+        const userData: AuthUser = {
           id: existingUser.id,
           email: existingUser.email,
           full_name: existingUser.name,

@@ -39,7 +39,7 @@ export default function FeaturesPage() {
               Gossiper combines cutting-edge AI technology with thoughtful design to create the most comprehensive
               real-time captioning and translation platform for education.
             </p>
-            <Button size="lg" className="text-lg px-8 hover:bg-black text-white transition-all" asChild>
+            <Button size="lg" className="text-lg px-8 hover:bg-black" asChild>
               <Link href="/signup">
                 Start Free Trial
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -104,9 +104,9 @@ export default function FeaturesPage() {
                 <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                   <Shield className="h-6 w-6 text-primary" />
                 </div>
-                <CardTitle>Base-Powered Payments</CardTitle>
+                <CardTitle>Solana-Powered Payments</CardTitle>
                 <CardDescription>
-                  Sustainable micro-payments via Base Pay. Students contribute as little as ₦50 with minimal
+                  Sustainable micro-payments via Solana Pay. Students contribute as little as ₦50 with minimal
                   transaction fees.
                 </CardDescription>
               </CardHeader>
@@ -395,7 +395,7 @@ export default function FeaturesPage() {
             </div>
           </div>
           <div className="border-t border-border mt-12 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2024 Gossiper. All rights reserved. Powered by Base.</p>
+            <p>&copy; 2024 Gossiper. All rights reserved. Powered by Solana.</p>
           </div>
         </div>
       </footer>
