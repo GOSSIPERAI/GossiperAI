@@ -31,7 +31,7 @@ After analyzing both the Template and GossiperAI codebases, I've identified sign
 ### 1. Enhanced Session Management System
 
 #### 1.1 Advanced Session State Management
-```typescript
+\`\`\`typescript
 // Enhanced session states and transitions
 export enum SessionStatus {
   DRAFT = 'draft',
@@ -50,10 +50,10 @@ export enum SessionTransition {
   ACTIVE_TO_ENDED = 'active_to_ended',
   ANY_TO_CANCELLED = 'any_to_cancelled'
 }
-```
+\`\`\`
 
 #### 1.2 Real-time Session Validation
-```typescript
+\`\`\`typescript
 // Enhanced session validation with real-time checks
 export interface SessionValidationResult {
   isValid: boolean
@@ -73,10 +73,10 @@ export interface ValidationError {
   field?: string
   severity: 'error' | 'warning'
 }
-```
+\`\`\`
 
 #### 1.3 Advanced Session Creation
-```typescript
+\`\`\`typescript
 // Enhanced session creation with validation and preview
 export interface CreateSessionRequest {
   title: string
@@ -109,12 +109,12 @@ export interface AccessibilitySettings {
   fontSize: FontSize
   colorScheme: ColorScheme
 }
-```
+\`\`\`
 
 ### 2. Comprehensive User Role Management
 
 #### 2.1 Granular Permission System
-```typescript
+\`\`\`typescript
 // Enhanced role-based permissions
 export enum Permission {
   // Session permissions
@@ -167,10 +167,10 @@ export interface UserRole {
   expiresAt?: Date
   isActive: boolean
 }
-```
+\`\`\`
 
 #### 2.2 Enhanced User Management
-```typescript
+\`\`\`typescript
 // Comprehensive user management with roles and permissions
 export interface User {
   id: string
@@ -198,12 +198,12 @@ export interface UserPreferences {
   privacy: PrivacySettings
   theme: ThemeSettings
 }
-```
+\`\`\`
 
 ### 3. Advanced Session Features
 
 #### 3.1 Session Analytics and Reporting
-```typescript
+\`\`\`typescript
 // Comprehensive session analytics
 export interface SessionAnalytics {
   sessionId: string
@@ -234,10 +234,10 @@ export interface TechnicalMetrics {
   captionQuality: number
   translationQuality: number
 }
-```
+\`\`\`
 
 #### 3.2 Real-time Session Management
-```typescript
+\`\`\`typescript
 // Real-time session management with WebSocket integration
 export interface SessionManager {
   // Session lifecycle management
@@ -260,12 +260,12 @@ export interface SessionManager {
   unsubscribeFromSession(sessionId: string): void
   broadcastSessionUpdate(sessionId: string, update: SessionUpdate): void
 }
-```
+\`\`\`
 
 ### 4. Enhanced Database Schema
 
 #### 4.1 Improved Session Table
-```sql
+\`\`\`sql
 -- Enhanced sessions table with better indexing and constraints
 CREATE TABLE sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -298,10 +298,10 @@ CREATE INDEX idx_sessions_created_by ON sessions(created_by);
 CREATE INDEX idx_sessions_status ON sessions(status);
 CREATE INDEX idx_sessions_start_time ON sessions(start_time);
 CREATE INDEX idx_sessions_created_at ON sessions(created_at);
-```
+\`\`\`
 
 #### 4.2 Enhanced Participants Table
-```sql
+\`\`\`sql
 -- Enhanced session participants table
 CREATE TABLE session_participants (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -321,10 +321,10 @@ CREATE TABLE session_participants (
 CREATE INDEX idx_session_participants_session_id ON session_participants(session_id);
 CREATE INDEX idx_session_participants_user_id ON session_participants(user_id);
 CREATE INDEX idx_session_participants_active ON session_participants(is_active);
-```
+\`\`\`
 
 #### 4.3 Role and Permission Tables
-```sql
+\`\`\`sql
 -- Roles table
 CREATE TABLE roles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -352,12 +352,12 @@ CREATE TABLE user_roles (
 CREATE INDEX idx_user_roles_user_id ON user_roles(user_id);
 CREATE INDEX idx_user_roles_role_id ON user_roles(role_id);
 CREATE INDEX idx_user_roles_active ON user_roles(is_active);
-```
+\`\`\`
 
 ### 5. API Improvements
 
 #### 5.1 Enhanced Session API Endpoints
-```typescript
+\`\`\`typescript
 // Enhanced API endpoints with better error handling and validation
 export class SessionAPI {
   // Session creation with validation
@@ -408,10 +408,10 @@ export class SessionAPI {
     }
   }
 }
-```
+\`\`\`
 
 #### 5.2 Real-time Session Updates
-```typescript
+\`\`\`typescript
 // WebSocket integration for real-time updates
 export class SessionWebSocket {
   private ws: WebSocket
@@ -452,7 +452,7 @@ export class SessionWebSocket {
     this.callbacks.delete(eventType)
   }
 }
-```
+\`\`\`
 
 ### 6. Implementation Roadmap
 
@@ -489,7 +489,7 @@ export class SessionWebSocket {
 ### 7. Migration Strategy
 
 #### 7.1 Database Migration
-```sql
+\`\`\`sql
 -- Migration script for existing data
 BEGIN;
 
@@ -541,10 +541,10 @@ WHERE r.name = CASE
 END;
 
 COMMIT;
-```
+\`\`\`
 
 #### 7.2 Code Migration
-```typescript
+\`\`\`typescript
 // Migration utilities for existing code
 export class MigrationUtils {
   // Migrate existing sessions to new format
@@ -565,7 +565,7 @@ export class MigrationUtils {
     }
   }
 }
-```
+\`\`\`
 
 ### 8. Benefits of Proposed Changes
 
