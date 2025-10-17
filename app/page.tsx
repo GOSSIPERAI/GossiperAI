@@ -12,7 +12,7 @@ export default function HomePage() {
       <MainNavigation />
 
       {/* Hero Section */}
-      <section className="relative py-20 lg:py-32">
+      <section className="relative py-20 lg:py-32 hover:cursor-default">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
@@ -29,7 +29,7 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="text-lg px-8" asChild>
+                <Button size="lg" className="text-lg px-8 hover:bg-black" asChild>
                   <Link href="/join-session">
                     Join a Session
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -46,7 +46,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="h-2 w-2 rounded-full bg-primary animate-pulse"></div>
-                  <span>Powered by Solana</span>
+                  <span>Powered by Base</span>
                 </div>
               </div>
             </div>
@@ -72,7 +72,7 @@ export default function HomePage() {
                   </div>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>12 students connected</span>
-                    <span>₦50 pool goal: 80% funded</span>
+                    {/* <span>₦50 pool goal: 80% funded</span> */}
                   </div>
                 </div>
               </div>
@@ -119,9 +119,9 @@ export default function HomePage() {
                 <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                   <Shield className="h-6 w-6 text-primary" />
                 </div>
-                <CardTitle>Solana-Powered</CardTitle>
+                <CardTitle>Base-Powered</CardTitle>
                 <CardDescription>
-                  Sustainable micro-payments via Solana Pay. Students contribute as little as ₦50 ($0.10).
+                  Sustainable micro-payments via Base Pay. Students contribute as little as ₦50 ($0.10).
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -174,7 +174,7 @@ export default function HomePage() {
                 Join thousands of students and educators already using Gossiper to break down barriers in learning.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
+                <Button size="lg" variant="secondary" className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white" asChild>
                   <Link href="/signup">
                     Start Free Trial
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -287,7 +287,7 @@ export default function HomePage() {
           {/* Copyright Section */}
           <div className="border-t border-border mt-8 sm:mt-12 pt-6 sm:pt-8 text-center">
             <p className="text-xs sm:text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} Gossiper. All rights reserved. Powered by Solana.
+              &copy; {new Date().getFullYear()} Gossiper. All rights reserved. Powered by Base.
             </p>
           </div>
         </div>
