@@ -26,10 +26,17 @@ const team = [
   },
   {
     name: "Victory",
-    role: "Head of Product",
-    bio: "Former product manager at Zoom, passionate about inclusive design and accessibility.",
-    image: "/professional-headshot-of-michael-rodriguez.jpg",
+    role: "Business Developer",
+    bio: "Growth-driven Business Developer specializing in lead generation, client acquisition, and long-term relationship management.",
+    image: "/Victory.jpg",
   },
+  {
+    name:'Hikaru',
+    role:"Frontend Developer",
+    bio:
+    `Passionate Frontend Developer turning ideas into sleek, interactive interfaces with clean code and great design.`,
+    image:'/Hikaru.jpg',
+  }
 ]
 
 const stats = [
