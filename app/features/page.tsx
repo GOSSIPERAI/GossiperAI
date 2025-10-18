@@ -395,7 +395,7 @@ export default function FeaturesPage() {
             </div>
           </div>
           <div className="border-t border-border mt-12 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2024 Gossiper. All rights reserved. Powered by Base.</p>
+            <p>&copy; {new Date().getFullYear()} Gossiper. All rights reserved. Powered by Base.</p>
           </div>
         </div>
       </footer>

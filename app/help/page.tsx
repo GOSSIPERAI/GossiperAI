@@ -278,7 +278,7 @@ export default function HelpPage() {
       <footer className="border-t border-border bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center text-muted-foreground">
-            <p>&copy; 2024 Gossiper. All rights reserved. Here to help you succeed.</p>
+            <p>&copy; {new Date().getFullYear()} Gossiper. All rights reserved. Here to help you succeed.</p>
           </div>
         </div>
       </footer>
