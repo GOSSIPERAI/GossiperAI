@@ -426,5 +426,9 @@
   "typescript": "^5"
   
 
+  },
+  "optionalDependencies": {
+    "@next/swc-win32-x64-msvc": "^15.5.6",
+    "@next/swc-linux-arm64-gnu": "^15.5.6"
   }
 }
