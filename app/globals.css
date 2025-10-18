@@ -41,7 +41,7 @@
   --font-nohemi: "Nohemi", sans-serif; /* Define Nohemi font */
 }
 
-.dark {
+.dark-mode {
   /* Updated dark mode colors to maintain brand consistency */
   --background: oklch(0.098 0.024 264.376); /* Blue Charcoal background */
   --foreground: oklch(1 0 0); /* White text */

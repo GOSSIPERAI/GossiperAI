@@ -29,7 +29,7 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="text-lg px-8 hover:bg-black transition-all" asChild>
+                <Button size="lg" className="text-lg px-8 transition-all" asChild>
                   <Link href="/join-session">
                     Join a Session
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -174,7 +174,7 @@ export default function HomePage() {
                 Join thousands of students and educators already using Gossiper to break down barriers in learning.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white" asChild>
+                <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
                   <Link href="/signup">
                     Start Free Trial
                     <ArrowRight className="ml-2 h-5 w-5" />

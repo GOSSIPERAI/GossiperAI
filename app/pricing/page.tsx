@@ -79,7 +79,7 @@ export default function PricingPage() {
               Accessible Education for <span className="text-primary">Everyone</span>
             </h1>
             <p className="text-xl text-muted-foreground text-pretty">
-              Fair, transparent pricing powered by Solana Pay. Students contribute as little as ₦50 per session, while
+              Fair, transparent pricing powered by Base Pay. Students contribute as little as ₦50 per session, while
               educators get powerful tools to make their content accessible.
             </p>
           </div>
@@ -238,7 +238,7 @@ export default function PricingPage() {
                 Join thousands of students and educators making education accessible for everyone.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white" asChild>
+                <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
                   <Link href="/signup">
                     Start Free Trial
                     <ArrowRight className="ml-2 h-5 w-5" />

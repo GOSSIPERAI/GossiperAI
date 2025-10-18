@@ -62,9 +62,9 @@ export function AccessibilityProvider({ children }: { children: ReactNode }) {
 
     // High contrast mode
     if (settings.highContrast) {
-      root.classList.add("high-contrast")
+      root.classList.add("dark-mode")
     } else {
-      root.classList.remove("high-contrast")
+      root.classList.remove("dark-mode")
     }
 
     // Font size

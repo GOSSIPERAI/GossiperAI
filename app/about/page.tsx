@@ -17,13 +17,15 @@ const team = [
     image: "/Melody.jpg",
   },
   {
-    name: "Sarah Chen",
-    role: "CTO",
-    bio: "AI/ML expert with experience at Google and Microsoft, specializing in real-time speech processing.",
-    image: "/professional-headshot-of-sarah-chen.jpg",
+    name: "Arixe",
+    role: "Backend Developer",
+    bio: 
+    `Professional backend developer, Arixe is a passionate and resiliant developer that not only writes efficient code,
+     but also is soft spoken and communicates greatly`,
+    image: "/Arixe.jpg",
   },
   {
-    name: "Michael Rodriguez",
+    name: "Victory",
     role: "Head of Product",
     bio: "Former product manager at Zoom, passionate about inclusive design and accessibility.",
     image: "/professional-headshot-of-michael-rodriguez.jpg",
@@ -262,7 +264,7 @@ export default function AboutPage() {
                 working toward universal educational access.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white" asChild>
+                <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
                   <Link href="/signup">
                     Get Started Today
                     <ArrowRight className="ml-2 h-5 w-5" />

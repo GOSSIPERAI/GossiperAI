@@ -91,7 +91,7 @@ export default function HelpPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-8 max-w-4xl mx-auto">
             <Badge variant="secondary" className="w-fit mx-auto">
-              Help Centre
+              Help Center
             </Badge>
             <h1 className="text-4xl lg:text-6xl font-bold text-balance">
               How can we <span className="text-primary">help you</span> today?
@@ -192,9 +192,9 @@ export default function HelpPage() {
                         </li>
                       ))}
                     </ul>
-                    <Button variant="outline" className="w-full mt-6 bg-transparent">
+                    {/* <Button variant="outline" className="w-full mt-6 bg-transparent">
                       View All Articles
-                    </Button>
+                    </Button> */}
                   </CardContent>
                 </Card>
               )
@@ -254,7 +254,7 @@ export default function HelpPage() {
                 education experts.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white" asChild>
+                <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
                   <Link href="/contact">
                     Contact Support
                     <ArrowRight className="ml-2 h-5 w-5" />
