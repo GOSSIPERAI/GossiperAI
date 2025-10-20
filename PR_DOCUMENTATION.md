@@ -28,7 +28,7 @@
 ### Dual Authentication Approach
 The system supports both traditional email/password and wallet-based authentication:
 
-```typescript
+\`\`\`typescript
 // Traditional auth flow
 signUp(email, password, { name, role })
 signIn(email, password)
@@ -36,10 +36,10 @@ signIn(email, password)
 // Wallet auth flow  
 signUpWithWallet(walletAddress, { name, role })
 signInWithWallet(walletAddress)
-```
+\`\`\`
 
 ### Database Schema
-```sql
+\`\`\`sql
 -- Profiles table with auto-creation trigger
 CREATE TABLE profiles (
   id UUID REFERENCES auth.users(id) PRIMARY KEY,
@@ -51,7 +51,7 @@ CREATE TABLE profiles (
   preferred_language TEXT DEFAULT 'en',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
-```
+\`\`\`
 
 ### Key Components
 - **`hooks/use-auth.tsx`**: Main authentication context and logic
@@ -68,7 +68,7 @@ CREATE TABLE profiles (
 4. **Ended**: Session concludes with data preservation
 
 ### Database Schema
-```sql
+\`\`\`sql
 CREATE TABLE sessions (
   id UUID PRIMARY KEY,
   title TEXT NOT NULL,
@@ -90,7 +90,7 @@ CREATE TABLE session_participants (
   joined_at TIMESTAMPTZ DEFAULT NOW(),
   is_active BOOLEAN DEFAULT true
 );
-```
+\`\`\`
 
 ### Key Components
 - **`app/api/sessions/create/route.ts`**: Session creation endpoint
@@ -102,9 +102,9 @@ CREATE TABLE session_participants (
 ## 🎯 Real-time Transcription System
 
 ### Architecture Flow
-```
+\`\`\`
 Audio Recording → AssemblyAI API → Webhook → Database → WebSocket → UI
-```
+\`\`\`
 
 ### Transcription Pipeline
 1. **Audio Capture**: Lecturer's microphone records in 5-second chunks
@@ -115,7 +115,7 @@ Audio Recording → AssemblyAI API → Webhook → Database → WebSocket → UI
 6. **Multi-language Translation**: Original text translated to participant languages
 
 ### Database Schema
-```sql
+\`\`\`sql
 CREATE TABLE transcriptions (
   id UUID PRIMARY KEY,
   session_id UUID REFERENCES sessions(id),
@@ -123,7 +123,7 @@ CREATE TABLE transcriptions (
   assembly_ai_job_id TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
-```
+\`\`\`
 
 ### Key Components
 - **`services/transcription/`**: Standalone transcription service
@@ -135,10 +135,10 @@ CREATE TABLE transcriptions (
 
 ### Mock Mode Support
 The system includes a mock mode for development and testing:
-```typescript
+\`\`\`typescript
 // Enable mock transcription in development
 ENABLE_MOCK_TRANSCRIPTION=true
-```
+\`\`\`
 
 ## 💰 Payment System
 
@@ -190,14 +190,14 @@ ENABLE_MOCK_TRANSCRIPTION=true
 - **Mock Support**: Simulated real-time updates for development
 
 ### Message Flow
-```typescript
+\`\`\`typescript
 interface WebSocketMessage {
   type: "caption" | "translation" | "session_update" | "participant_update"
   sessionId: string
   data: any
   timestamp: Date
 }
-```
+\`\`\`
 
 ## 📱 User Flows
 
@@ -217,7 +217,7 @@ interface WebSocketMessage {
 ## 🚀 Deployment & Configuration
 
 ### Environment Variables
-```env
+\`\`\`env
 # Solana Configuration
 NEXT_PUBLIC_SOLANA_NETWORK=devnet
 NEXT_PUBLIC_APP_URL=http://localhost:3000
@@ -232,7 +232,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
 # Development
 ENABLE_MOCK_TRANSCRIPTION=true
-```
+\`\`\`
 
 ### Database Setup
 1. **Supabase Project**: Create new Supabase project
@@ -256,12 +256,12 @@ The system includes comprehensive mock functionality:
 - **Mock Sessions**: Sample session data
 
 ### Development Scripts
-```bash
+\`\`\`bash
 pnpm run dev          # Start development server
 pnpm run build        # Build for production
 pnpm run start        # Start production server
 pnpm run lint         # Run ESLint
-```
+\`\`\`
 
 ## 🔧 Key Technical Decisions
 
@@ -330,7 +330,7 @@ pnpm run lint         # Run ESLint
 
 ## 📁 Project Structure
 
-```
+\`\`\`
 gossiper/
 ├── app/                          # Next.js App Router
 │   ├── api/                     # API routes
@@ -360,7 +360,7 @@ gossiper/
 │   └── transcription/         # AssemblyAI integration
 ├── Database_Schema/           # Database schema files
 └── public/                    # Static assets
-```
+\`\`\`
 
 ## 🔍 Code Quality & Standards
 

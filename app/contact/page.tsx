@@ -19,9 +19,9 @@ const contactMethods = [
     icon: Mail,
     title: "Email Support",
     description: "Get help via email within 24 hours",
-    // contact: "support@gossiper.ai",
+    contact: "Gossiperai.sol@gmail.com",
     action: "Send Email",
-    href:'mailto:Agbajeomobobola6@gmail.com'
+    href:'mailto:Gossiperai.sol@gmail.com'
   },
   {
     icon: MessageCircle,

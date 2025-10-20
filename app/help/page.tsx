@@ -108,7 +108,7 @@ export default function HelpPage() {
                   placeholder="Search for help articles, guides, and tutorials..."
                   className="pl-12 h-14 text-lg"
                 />
-                <Button className="absolute right-2 top-2 h-10">Search</Button>
+                <Button className="absolute right-2 top-2 h-10 hover:bg-black">Search</Button>
               </div>
             </div>
           </div>

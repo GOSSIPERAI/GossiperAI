@@ -5,16 +5,13 @@ import { Heart, Users, Globe, Target, ArrowRight, Award, TrendingUp } from "luci
 import Link from "next/link"
 import { MainNavigation } from "@/components/main-navigation"
 
-const founder = `Agbaje Omobobola Melody`;
-
+const founder = "Agbaje Melody";
 const team = [
   {
-    name: "Agbaje Omobobola Melody",
+    name: `${founder}`,
     role: "Founder & CEO",
-    bio: 
-    `Melody is a teacher who is passionate about growth, education, and creating spaces where every voice is heard.
-     Her work reflects humility, purpose, and a deep belief in the power of connection.`,
-    image: "/Melody.jpg",
+    bio: "Former accessibility researcher at University of Lagos with 10+ years in educational technology.",
+    image: "/melody.jpg",
   },
   {
     name: "Arixe",
@@ -95,9 +92,9 @@ export default function AboutPage() {
                   <h3 className="text-xl font-semibold">Why We Started</h3>
                 </div>
                 <p className="text-muted-foreground">
-                 ` Our founder, {founder}, witnessed firsthand how language barriers and hearing difficulties
+                  Our founder, {founder}, witnessed firsthand how language barriers and hearing difficulties
                   prevented brilliant students from reaching their full potential. Traditional solutions were expensive,
-                  slow, and often unavailable in developing regions.`
+                  slow, and often unavailable in developing regions.
                 </p>
               </div>
 
