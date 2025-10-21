@@ -22,7 +22,7 @@ import { MainNavigation } from "@/components/main-navigation"
 
 export default function FeaturesPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div  className="min-h-screen bg-background">
       <MainNavigation />
 
       {/* Hero Section */}

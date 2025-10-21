@@ -35,9 +35,9 @@ const contactMethods = [
     icon: Phone,
     title: "Phone Support",
     description: "Speak directly with our team",
-    contact: "+234 (0) 912 814 5664",
+    contact: "+234 (0) 705 968 8128",
     action: "Call Now",
-    href:'tel:+2349128145664'
+    href:'tel:+2347059688128'
   },
 ]
 
@@ -326,7 +326,7 @@ export default function ContactPage() {
       <footer className="border-t border-border bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center text-muted-foreground">
-            <p>&copy; 2024 Gossiper. All rights reserved. We're here to help.</p>
+            <p>&copy; {new Date().getFullYear()} Gossiper. All rights reserved. We're here to help.</p>
           </div>
         </div>
       </footer>
