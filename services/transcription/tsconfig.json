@@ -20,9 +20,8 @@
       }
     },
     "include": [
-      "**/*.ts",
-      "**/*.tsx",
-      "types/**/*.ts"
+      "lib/**/*.ts",
+      "api/transcribe.ts"
     ],
     "exclude": [
       "node_modules",

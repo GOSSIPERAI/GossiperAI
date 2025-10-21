@@ -1,0 +1,24 @@
+# Environment Variables Example
+# Copy this to .env.local for local development
+NEXT_PUBLIC_SUPABASE_URL=https://biezwzvwlfxmmqqwxuyn.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZXp3enZ3bGZ4bW1xcXd4dXluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0ODY5MDcsImV4cCI6MjA3NDA2MjkwN30.ZAvURJnnTtOlR49Rka7Nvs8ahcNKPk6qlcVv-3llLps
+
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZXp3enZ3bGZ4bW1xcXd4dXluIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODQ4NjkwNywiZXhwIjoyMDc0MDYyOTA3fQ._sXlYZ-Toekbi30qNIddK3YS9NIS3GldYeu_YJOSWkk
+
+NEXT_PUBLIC_APP_URL=https://gossiper-ai.vercel.app
+NEXT_PUBLIC_SESSION_PAYMENT_CONTRACT=0xf9485D9820c151a2b000bA8F40075580ECc644C3
+NEXT_PUBLIC_BASE_NETWORK=sepolia
+
+"DATABASE_URL=postgresql://neondb_owner:npg_jzB07dxYqOnv@ep-still-snowflake-a4hy02a6-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+
+# Required: Your AssemblyAI API key
+ASSEMBLYAI_API_KEY=c1da59555c8649c99f60fefd0b920e1b
+
+# Optional: Maximum file size for uploads in MB (default: 50)
+MAX_FILE_SIZE_MB=50
+
+
+
+
+JWT_SECRET=your-super-secret-jwt-key-change-in-production
+
