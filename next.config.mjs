@@ -45,7 +45,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Permissions-Policy',
-            value: 'microphone=(self), camera=(), geolocation=()'  // ✅ Allow access
+            value: 'microphone=(self), camera=(self), geolocation=(self)'  // ✅ Allow access
           }
         ]
       }
