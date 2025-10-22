@@ -35,7 +35,7 @@ interface UseRealtimeTranscriptionsOptions {
 
 export function useRealtimeTranscriptions({
   sessionId,
-  enabled = false,
+  enabled = true,
   onTranscriptionReceived,
   onError,
 }: UseRealtimeTranscriptionsOptions) {

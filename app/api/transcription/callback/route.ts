@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import type { WebhookPayload } from "../../../../services/transcription/lib/types"
-import { createServerSupabaseClient } from "@/lib/supabase-server"
+import { createServiceRoleSupabaseClient } from "@/lib/supabase-server"
 import { TranscriptionValidator } from "@/lib/validation/transcription-validation"
 
 // TODO: REVERT FOR LIVE DATA - Remove in-memory store when using real AssemblyAI
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       const { wordCount, characterCount } = TranscriptionValidator.calculateTextMetrics(payload.text)
 
       try {
-        const supabase = createServerSupabaseClient()
+        const supabase = createServiceRoleSupabaseClient()
 
         const { data, error } = await supabase
           .from("transcriptions")
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       console.error("📞 [CALLBACK] Transcription failed:", payload.error)
 
       try {
-        const supabase = createServerSupabaseClient()
+        const supabase = createServiceRoleSupabaseClient()
         await supabase.from("transcriptions").insert({
           session_id: sessionId,
           text: null,
@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
 
     try {
       // Try to get results from Supabase first
-      const supabase = createServerSupabaseClient()
+      const supabase = createServiceRoleSupabaseClient()
 
       const { data: dbResults, error } = await supabase
         .from("transcriptions")

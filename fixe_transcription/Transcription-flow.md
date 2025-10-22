@@ -19,7 +19,7 @@ Server receives transcription
   ↓ validates payload and inserts row into
 Supabase table: transcriptions (includes session_id, text, confidence, metrics)
   ↓ triggers
-Supabase Realtime broadcast to subscribed clients
+Supabase Realtime postgress broadcast to subscribed clients
 
 Client update (no polling)
   ↓ useRealtimeTranscriptions receives change payload
