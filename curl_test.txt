@@ -1,0 +1,10 @@
+ Invoke-RestMethod -Uri "https://gossiper-ai.vercel.app/api/transcription/callback?sessionId=de6288d2-e1e2-4c43-b877-56a58f92264d" `
+>>   -Method POST `
+>>   -Headers @{ "Content-Type" = "application/json" } `
+>>   -Body '{
+>>     "transcript_id": "test-callback-123",
+>>     "status": "completed",
+>>     "text": "This is a test transcription.",
+>>     "confidence": 0.93
+>>   }'
+>>
