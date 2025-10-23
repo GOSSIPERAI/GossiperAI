@@ -113,13 +113,10 @@ export default async function handler(
       );
     }
 
-    // Submit transcription job with our webhook URL
-    // AssemblyAI will call our webhook, which will then forward to client's callback
-    const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://your-domain.com'}/api/webhook?callbackUrl=${encodeURIComponent(callbackUrl)}`;
-    
+    // Submit transcription job
     const result = await AssemblyAIService.submitTranscriptionJob(
       audioUrl!,
-      webhookUrl,
+      callbackUrl,
       languageCode
     );
 
