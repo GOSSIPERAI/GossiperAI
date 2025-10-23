@@ -75,8 +75,7 @@ export async function middleware(request: NextRequest) {
     '/forgot-password',
     '/auth/callback', //added this
     '/auth',
-    '/api/transcription/callback',
-    '/services/transcription/api/webhook', // AssemblyAI webhook endpoint
+    '/api/transcription/callback', // AssemblyAI webhook endpoint
     '/',
     '/features',
     '/pricing',
