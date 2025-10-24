@@ -215,9 +215,14 @@ type WebhookPayload = {
 const transcriptionStore = new Map<string, any[]>()
 
 export async function POST(request: NextRequest) {
+  const timestamp = new Date().toISOString()
+  const requestId = Math.random().toString(36).substring(7)
+  
   try {
     console.log("🚀 [CALLBACK] ===== ASSEMBLYAI WEBHOOK RECEIVED =====")
     console.log("📞 [CALLBACK] Request received via App Router")
+    console.log("📞 [CALLBACK] Request ID:", requestId)
+    console.log("📞 [CALLBACK] Timestamp:", timestamp)
     console.log("📞 [CALLBACK] Headers:", Object.fromEntries(request.headers.entries()))
     console.log("📞 [CALLBACK] URL:", request.url)
     console.log("📞 [CALLBACK] Method:", request.method)
@@ -232,8 +237,21 @@ export async function POST(request: NextRequest) {
     try {
       payload = await request.json()
       console.log("📞 [CALLBACK] ✅ Successfully parsed JSON payload")
+      
+      // IMMEDIATE RAW PAYLOAD LOGGING FOR DEBUGGING
+      console.log("🔍 [CALLBACK] ===== RAW PAYLOAD DEBUG =====")
+      console.log("🔍 [CALLBACK] Request ID:", requestId)
+      console.log("🔍 [CALLBACK] Timestamp:", timestamp)
+      console.log("🔍 [CALLBACK] Session ID:", sessionId)
+      console.log("🔍 [CALLBACK] Raw payload (stringified):", JSON.stringify(payload, null, 2))
+      console.log("🔍 [CALLBACK] Payload keys:", Object.keys(payload))
+      console.log("🔍 [CALLBACK] Payload transcript_id:", payload.transcript_id || payload.id)
+      console.log("🔍 [CALLBACK] Payload status:", payload.status)
+      console.log("🔍 [CALLBACK] ===== END RAW PAYLOAD DEBUG =====")
+      
     } catch (parseError) {
       console.error("📞 [CALLBACK] ❌ Failed to parse JSON payload:", parseError)
+      console.error("📞 [CALLBACK] Raw request body (if available):", await request.text().catch(() => "Could not read body"))
       return NextResponse.json({
         success: false,
         error: "Invalid JSON payload"
@@ -360,25 +378,35 @@ export async function POST(request: NextRequest) {
     }
 
     console.log("📞 [CALLBACK] ===== CALLBACK PROCESSING COMPLETE =====")
+    console.log("📞 [CALLBACK] Request ID:", requestId)
+    console.log("📞 [CALLBACK] Returning 200 OK to AssemblyAI")
+    
     return NextResponse.json({
       success: true,
       message: "Transcription callback processed successfully",
       sessionId,
       status: payload.status,
-      processed: true
+      processed: true,
+      requestId,
+      timestamp
     })
   } catch (error) {
     console.error("📞 [CALLBACK] ❌ Error processing transcription callback:", error)
+    console.error("📞 [CALLBACK] Request ID:", requestId)
     console.error("📞 [CALLBACK] Error details:", {
       message: error instanceof Error ? error.message : "Unknown error",
       stack: error instanceof Error ? error.stack : undefined
     })
 
+    // Still return 200 to AssemblyAI to prevent retries
+    console.log("📞 [CALLBACK] Returning 200 OK to AssemblyAI despite error")
     return NextResponse.json({
-      success: false,
+      success: true,
       message: "Callback received but processing failed",
-      error: error instanceof Error ? error.message : "Unknown error"
-    }, { status: 500 })
+      error: error instanceof Error ? error.message : "Unknown error",
+      requestId,
+      timestamp
+    })
   }
 }
 

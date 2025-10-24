@@ -1,0 +1,390 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Updated color tokens to match Gossiper brand colors */
+  --background: 0 0% 100%; /* White background */
+  --foreground: 222.2 84% 4.9%; /* Blue Charcoal #00051B */
+  --card: 0 0% 98%; /* Light card background */
+  --card-foreground: 222.2 84% 4.9%; /* Blue Charcoal text on cards */
+  --popover: 0 0% 100%; /* White popover background */
+  --popover-foreground: 222.2 84% 4.9%; /* Blue Charcoal text in popovers */
+  --primary: 221.2 83.2% 53.3%; /* Ribbon Blue #043AF4 */
+  --primary-foreground: 210 40% 98%; /* White text on primary */
+  --secondary: 210 40% 96%; /* Light secondary background */
+  --secondary-foreground: 222.2 84% 4.9%; /* Blue Charcoal on secondary */
+  --muted: 210 40% 96%; /* Muted background */
+  --muted-foreground: 215.4 16.3% 46.9%; /* Muted text */
+  --accent: 210 40% 96%; /* Accent background */
+  --accent-foreground: 222.2 84% 4.9%; /* Blue Charcoal on accent */
+  --destructive: 0 84.2% 60.2%; /* Destructive red */
+  --destructive-foreground: 210 40% 98%; /* White text on destructive */
+  --border: 214.3 31.8% 91.4%; /* Subtle blue-tinted border */
+  --input: 214.3 31.8% 91.4%; /* Input border */
+  --ring: 221.2 83.2% 53.3%; /* Ribbon Blue focus ring */
+  --chart-1: 221.2 83.2% 53.3%; /* Ribbon Blue for charts */
+  --chart-2: 210 40% 96%; /* Light blue for charts */
+  --chart-3: 217.2 32.6% 17.5%; /* Medium blue variant */
+  --chart-4: 222.2 84% 4.9%; /* Dark blue variant */
+  --chart-5: 210 40% 96%; /* Light variant */
+  --radius: 0.5rem; /* 8px border radius as per SRS */
+}
+
+.dark {
+  /* Updated dark mode colors to maintain brand consistency */
+  --background: 222.2 84% 4.9%; /* Blue Charcoal background */
+  --foreground: 210 40% 98%; /* White text */
+  --card: 222.2 84% 4.9%; /* Darker card background */
+  --card-foreground: 210 40% 98%; /* White text on cards */
+  --popover: 222.2 84% 4.9%; /* Dark popover background */
+  --popover-foreground: 210 40% 98%; /* White text in popovers */
+  --primary: 221.2 83.2% 53.3%; /* Brighter Ribbon Blue for dark mode */
+  --primary-foreground: 210 40% 98%; /* White text on primary */
+  --secondary: 217.2 32.6% 17.5%; /* Darker secondary */
+  --secondary-foreground: 210 40% 98%; /* White text on secondary */
+  --muted: 217.2 32.6% 17.5%; /* Dark muted background */
+  --muted-foreground: 215 20.2% 65.1%; /* Light muted text */
+  --accent: 217.2 32.6% 17.5%; /* Dark accent */
+  --accent-foreground: 210 40% 98%; /* White text on accent */
+  --destructive: 0 62.8% 30.6%; /* Destructive red */
+  --destructive-foreground: 210 40% 98%; /* White text on destructive */
+  --border: 217.2 32.6% 17.5%; /* Dark border */
+  --input: 217.2 32.6% 17.5%; /* Dark input background */
+  --ring: 221.2 83.2% 53.3%; /* Bright Ribbon Blue focus ring */
+  --chart-1: 221.2 83.2% 53.3%; /* Bright Ribbon Blue for charts */
+  --chart-2: 210 40% 96%; /* Light blue for charts */
+  --chart-3: 217.2 32.6% 17.5%; /* Medium blue variant */
+  --chart-4: 222.2 84% 4.9%; /* Dark blue variant */
+  --chart-5: 210 40% 96%; /* Light variant */
+}
+
+/* Added comprehensive accessibility styles for WCAG 2.1 AA compliance */
+
+/* High Contrast Mode */
+.high-contrast {
+  --background: 240 10% 8%; /* Very dark blue-gray background */
+  --foreground: 0 0% 98%; /* Near white text */
+  --card: 240 10% 12%; /* Slightly lighter dark blue-gray for cards */
+  --card-foreground: 0 0% 98%; /* Near white text on cards */
+  --primary: 221 83% 75%; /* Bright blue for primary elements */
+  --primary-foreground: 0 0% 5%; /* Very dark text on primary */
+  --secondary: 142 76% 65%; /* Bright green for secondary elements */
+  --secondary-foreground: 0 0% 5%; /* Very dark text on secondary */
+  --muted: 240 10% 20%; /* Medium dark blue-gray for muted areas */
+  --muted-foreground: 0 0% 85%; /* Light gray for muted text */
+  --accent: 38 92% 70%; /* Bright orange for accent elements */
+  --accent-foreground: 0 0% 5%; /* Very dark text on accent */
+  --destructive: 0 84% 65%; /* Bright red for destructive actions */
+  --destructive-foreground: 0 0% 98%; /* Near white text on destructive */
+  --border: 60 100% 70%; /* Bright yellow for borders */
+  --input: 240 10% 15%; /* Dark input background */
+  --ring: 60 100% 60%; /* Bright yellow focus ring */
+}
+
+.high-contrast * {
+  border-color: var(--border) !important;
+  color-scheme: dark;
+}
+
+.high-contrast button,
+.high-contrast input,
+.high-contrast select,
+.high-contrast textarea,
+.high-contrast [role="button"],
+.high-contrast [role="link"] {
+  border: 2px solid var(--border) !important;
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.high-contrast .bg-primary {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+.high-contrast .bg-secondary {
+  background-color: hsl(var(--secondary)) !important;
+  color: hsl(var(--secondary-foreground)) !important;
+}
+
+.high-contrast .bg-muted {
+  background-color: hsl(var(--muted)) !important;
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.high-contrast .bg-accent {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+.high-contrast .text-primary {
+  color: hsl(var(--primary)) !important;
+}
+
+.high-contrast .text-secondary {
+  color: hsl(var(--secondary)) !important;
+}
+
+.high-contrast .text-muted-foreground {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.high-contrast .text-accent-foreground {
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+.high-contrast .text-destructive {
+  color: hsl(var(--destructive)) !important;
+}
+
+/* Font Size Variants */
+.font-small {
+  font-size: 14px;
+}
+
+.font-small h1 {
+  font-size: 2rem;
+}
+.font-small h2 {
+  font-size: 1.75rem;
+}
+.font-small h3 {
+  font-size: 1.5rem;
+}
+.font-small h4 {
+  font-size: 1.25rem;
+}
+.font-small h5 {
+  font-size: 1.125rem;
+}
+.font-small h6 {
+  font-size: 1rem;
+}
+
+.font-medium {
+  font-size: 16px;
+}
+
+.font-medium h1 {
+  font-size: 2.5rem;
+}
+.font-medium h2 {
+  font-size: 2rem;
+}
+.font-medium h3 {
+  font-size: 1.75rem;
+}
+.font-medium h4 {
+  font-size: 1.5rem;
+}
+.font-medium h5 {
+  font-size: 1.25rem;
+}
+.font-medium h6 {
+  font-size: 1.125rem;
+}
+
+.font-large {
+  font-size: 18px;
+}
+
+.font-large h1 {
+  font-size: 3rem;
+}
+.font-large h2 {
+  font-size: 2.5rem;
+}
+.font-large h3 {
+  font-size: 2rem;
+}
+.font-large h4 {
+  font-size: 1.75rem;
+}
+.font-large h5 {
+  font-size: 1.5rem;
+}
+.font-large h6 {
+  font-size: 1.25rem;
+}
+
+/* Reduced Motion */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Screen Reader Optimizations */
+.screen-reader-optimized {
+  --ring: oklch(1 0.5 60); /* High contrast yellow focus ring for screen readers */
+}
+
+.screen-reader-optimized *:focus {
+  outline: 3px solid var(--ring) !important;
+  outline-offset: 2px !important;
+}
+
+.screen-reader-optimized .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.screen-reader-optimized .sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0.5rem;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  background: var(--background);
+  color: var(--foreground);
+  border: 2px solid var(--ring);
+}
+
+/* Enhanced Focus Indicators */
+.focus-visible-enabled *:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.focus-visible-enabled button:focus-visible,
+.focus-visible-enabled input:focus-visible,
+.focus-visible-enabled select:focus-visible,
+.focus-visible-enabled textarea:focus-visible,
+.focus-visible-enabled [role="button"]:focus-visible,
+.focus-visible-enabled [role="link"]:focus-visible {
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* Skip Links */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 4px;
+  z-index: 1000;
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+/* Live Region Styles */
+.live-region {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.live-region.polite {
+  /* Announced when user is idle */
+}
+
+.live-region.assertive {
+  /* Announced immediately */
+}
+
+/* Keyboard Navigation Enhancements */
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
+/* Error States for Accessibility */
+.error input,
+.error select,
+.error textarea {
+  border-color: var(--destructive);
+  box-shadow: 0 0 0 1px var(--destructive);
+}
+
+.error-message {
+  color: var(--destructive);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Caption Accessibility Enhancements */
+.caption-text {
+  line-height: 1.6;
+  word-spacing: 0.1em;
+  letter-spacing: 0.02em;
+}
+
+.caption-text.high-contrast {
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Responsive Text Scaling */
+@media (max-width: 768px) {
+  .font-small {
+    font-size: 13px;
+  }
+  .font-medium {
+    font-size: 15px;
+  }
+  .font-large {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 480px) {
+  .font-small {
+    font-size: 12px;
+  }
+  .font-medium {
+    font-size: 14px;
+  }
+  .font-large {
+    font-size: 16px;
+  }
+}
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+ @keyframes shimmer {
+  0% { transform: translateX(-100%); }
+   100% { transform: translateX(100%); }
+}
+
+ .animate-shimmer {
+  animation: shimmer 3s infinite;
+ }
+
+/* Hide scrollbar for horizontal scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}

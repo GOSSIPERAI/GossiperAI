@@ -82,6 +82,7 @@ if (request.nextUrl.pathname.startsWith('/api/transcription/callback')) {
     '/forgot-password',
     '/auth/callback', //added this
     '/auth',
+    '/api',
     '/api/transcription/callback', // AssemblyAI webhook endpoint
     '/',
     '/features',
