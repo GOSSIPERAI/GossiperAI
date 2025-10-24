@@ -1,4 +1,4 @@
-// api/webhook.ts
+/*api/webhook.ts
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import { HttpClient, Logger, ErrorHandler } from '../lib/assemblyai';
@@ -139,3 +139,4 @@ export async function handleWebhookWithCustomCallback(
     });
   }
 }
+*/

@@ -1,194 +1,36 @@
-//import { type NextRequest, NextResponse } from "next/server"
-//import type { WebhookPayload } from "../../../../services/transcription/lib/types"
-//import { createServiceRoleSupabaseClient } from "@/lib/supabase-server"
-//import { TranscriptionValidator } from "@/lib/validation/transcription-validation"
-
-// TODO: REVERT FOR LIVE DATA - Remove in-memory store when using real AssemblyAI
-// In-memory store for transcription results (kept for fallback)
-/*const transcriptionStore = new Map<string, any[]>()
-
-export async function POST(request: NextRequest) {
-  try {
-    console.log("📞 [CALLBACK] Request received via App Router")
-    console.log("📞 [CALLBACK] Headers:", Object.fromEntries(request.headers.entries()))
-    console.log("📞 [CALLBACK] URL:", request.url)
-
-    const { searchParams } = new URL(request.url)
-    const sessionId = searchParams.get("sessionId") || "default"
-
-    console.log("📞 [CALLBACK] Extracted session ID:", sessionId)
-
-    const payload: WebhookPayload = await request.json()
-
-    console.log("📞 [CALLBACK] Payload received:", {
-      transcriptId: payload.transcript_id,
-      status: payload.status,
-      hasText: !!payload.text,
-      confidence: payload.confidence,
-      textLength: payload.text?.length || 0,
-      textPreview: payload.text?.substring(0, 100) + (payload.text && payload.text.length > 100 ? "..." : ""),
-    })
-
-    if (payload.status === "completed" && payload.text) {
-      // Validate text quality
-      const textValidation = TranscriptionValidator.validateTextQuality(payload.text)
-      if (textValidation.warnings.length > 0) {
-        console.warn("📞 [CALLBACK] Text quality warnings:", textValidation.warnings)
-      }
-
-      // Calculate text metrics
-      const { wordCount, characterCount } = TranscriptionValidator.calculateTextMetrics(payload.text)
-
-      try {
-        const supabase = createServiceRoleSupabaseClient()
-
-        const { data, error } = await supabase
-          .from("transcriptions")
-          .insert({
-            session_id: sessionId,
-            text: payload.text,
-            status: payload.status,
-            assembly_ai_job_id: payload.transcript_id,
-            confidence: payload.confidence || null,
-            language_code: "en", // Default to English, can be enhanced later
-            word_count: wordCount,
-            character_count: characterCount,
-          })
-          .select()
-
-        if (error) {
-          console.error("📞 [CALLBACK] Supabase insert error:", error)
-          throw error
-        }
-
-        console.log("📞 [CALLBACK] Transcription stored in Supabase with metrics:", {
-          sessionId,
-          transcriptionId: data[0]?.id,
-          wordCount,
-          characterCount,
-          confidence: payload.confidence,
-          textPreview: payload.text?.substring(0, 100) + "...",
-        })
-
-        // No need for manual WebSocket or polling - clients subscribed to this session will receive the update instantly
-      } catch (dbError) {
-        console.error("📞 [CALLBACK] Database error:", dbError)
-        // Return success to AssemblyAI even if DB fails to avoid retries
-      }
-    } else if (payload.status === "error") {
-      console.error("📞 [CALLBACK] Transcription failed:", payload.error)
-
-      try {
-        const supabase = createServiceRoleSupabaseClient()
-        await supabase.from("transcriptions").insert({
-          session_id: sessionId,
-          text: null,
-          status: "error",
-          assembly_ai_job_id: payload.transcript_id,
-          error_message: payload.error || "Unknown error",
-        })
-      } catch (dbError) {
-        console.error("📞 [CALLBACK] Failed to store error status:", dbError)
-      }
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: "Transcription callback processed successfully",
-    })
-  } catch (error) {
-    console.error("📞 [CALLBACK] Error processing transcription callback:", error)
-
-    return NextResponse.json({
-      success: true,
-      message: "Callback received but processing failed",
-    })
-  }
-}
-
-// GET endpoint to retrieve transcription results
-export async function GET(request: NextRequest) {
-  try {
-    console.log("📥 [CALLBACK-GET] Request received via App Router")
-    console.log("📥 [CALLBACK-GET] URL:", request.url)
-
-    const { searchParams } = new URL(request.url)
-    const sessionId = searchParams.get("sessionId") || "default"
-
-    console.log("📥 [CALLBACK-GET] Session ID:", sessionId)
-
-    try {
-      // Try to get results from Supabase first
-      const supabase = createServiceRoleSupabaseClient()
-
-      const { data: dbResults, error } = await supabase
-        .from("transcriptions")
-        .select("*")
-        .eq("session_id", sessionId)
-        .order("created_at", { ascending: true })
-
-      if (error) {
-        console.error("📥 [CALLBACK-GET] Supabase query error:", error)
-        throw error
-      }
-
-      // Transform Supabase results to match expected format
-      const results = dbResults.map((row) => ({
-        id: row.assembly_ai_job_id,
-        text: row.text,
-        confidence: row.confidence || 0.9, // Default confidence for database results
-        timestamp: new Date(row.created_at),
-        status: row.status,
-        audioUrl: null, // Not stored in database
-      }))
-
-      console.log("📥 [CALLBACK-GET] Returning Supabase results:", {
-        sessionId,
-        resultCount: results.length,
-        results: results.map((r) => ({ id: r.id, text: r.text?.substring(0, 50) + "...", timestamp: r.timestamp })),
-      })
-
-      return NextResponse.json({
-        success: true,
-        results,
-        count: results.length,
-      })
-    } catch (dbError) {
-      console.error("📥 [CALLBACK-GET] Database error, falling back to memory:", dbError)
-
-      // Fallback to in-memory storage
-      const results = transcriptionStore.get(sessionId) || []
-
-      console.log("📥 [CALLBACK-GET] Returning memory results:", {
-        sessionId,
-        resultCount: results.length,
-        results: results.map((r) => ({ id: r.id, text: r.text?.substring(0, 50) + "...", timestamp: r.timestamp })),
-      })
-
-      return NextResponse.json({
-        success: true,
-        results,
-        count: results.length,
-      })
-    }
-  } catch (error) {
-    console.error("📥 [CALLBACK-GET] Error retrieving transcription results:", error)
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to retrieve results",
-      },
-      { status: 500 },
-    )
-  }
-}
-*/
-
-
-import { type NextRequest, NextResponse } from "next/server"
+/*import { type NextRequest, NextResponse } from "next/server"
 import { createServiceRoleSupabaseClient } from "@/lib/supabase-server"
 import { TranscriptionValidator } from "@/lib/validation/transcription-validation"
+import fs from 'fs/promises'
+import path from 'path'
+
+// In-memory store for debug payloads
+const debugPayloadStore = new Map<string, any[]>()
+
+// Utility function to store debug payload
+async function storeDebugPayload(sessionId: string, payload: any) {
+  // Store in memory
+  const sessionPayloads = debugPayloadStore.get(sessionId) || []
+  sessionPayloads.push({
+    timestamp: new Date().toISOString(),
+    payload
+  })
+  debugPayloadStore.set(sessionId, sessionPayloads)
+
+  // Store to file system (in a logs directory)
+  try {
+    const logDir = path.join(process.cwd(), 'logs', 'callbacks')
+    await fs.mkdir(logDir, { recursive: true })
+    
+    const filename = `callback-${sessionId}-${Date.now()}.json`
+    await fs.writeFile(
+      path.join(logDir, filename),
+      JSON.stringify({ timestamp: new Date().toISOString(), payload }, null, 2)
+    )
+  } catch (error) {
+    console.error('Failed to write debug payload to file:', error)
+  }
+}
 
 // AssemblyAI webhook payload type based on actual response
 type WebhookPayload = {
@@ -238,6 +80,10 @@ export async function POST(request: NextRequest) {
       payload = await request.json()
       console.log("📞 [CALLBACK] ✅ Successfully parsed JSON payload")
       
+      // Store payload for debugging
+      await storeDebugPayload(sessionId, payload)
+      console.log("📞 [CALLBACK] ✅ Debug payload stored successfully")
+
       // IMMEDIATE RAW PAYLOAD LOGGING FOR DEBUGGING
       console.log("🔍 [CALLBACK] ===== RAW PAYLOAD DEBUG =====")
       console.log("🔍 [CALLBACK] Request ID:", requestId)
@@ -516,5 +362,103 @@ export async function GET(request: NextRequest) {
       },
       { status: 500 },
     )
+  }
+}
+*/                                                                        
+
+
+
+import { type NextRequest, NextResponse } from "next/server";
+import { createServiceRoleSupabaseClient } from "@/lib/supabase-server";
+import { TranscriptionValidator } from "@/lib/validation/transcription-validation";
+import fs from "fs/promises";
+import path from "path";
+
+export async function POST(req: NextRequest) {
+  const supabase = createServiceRoleSupabaseClient();
+
+  try {
+    const { searchParams } = new URL(req.url);
+    const sessionId = searchParams.get("sessionId");
+    const payload = await req.json();
+
+    if (!sessionId) {
+      return NextResponse.json({ error: "Missing sessionId" }, { status: 400 });
+    }
+
+    // 🔍 Validate the webhook payload with Zod
+    const validation = TranscriptionValidator.safeParse(payload);
+    if (!validation.success) {
+      console.error("❌ Invalid AssemblyAI payload:", validation.error.format());
+      return NextResponse.json(
+        { error: "Invalid payload", details: validation.error.format() },
+        { status: 400 }
+      );
+    }
+
+    const validatedPayload = validation.data;
+
+    // ✅ Ensure the session exists before inserting
+    const { data: existingSession, error: sessionError } = await supabase
+      .from("sessions")
+      .select("id")
+      .eq("id", sessionId)
+      .maybeSingle();
+
+    if (sessionError) throw sessionError;
+
+    if (!existingSession) {
+      console.warn("⚠️ Session not found — auto-creating session for:", sessionId);
+      const { error: createErr } = await supabase
+        .from("sessions")
+        .insert({ id: sessionId, created_at: new Date().toISOString() });
+      if (createErr) throw createErr;
+    }
+
+    // 🧮 Compute text metrics if text is available
+    const { wordCount, characterCount } = validatedPayload.text
+      ? TranscriptionValidator.calculateTextMetrics(validatedPayload.text)
+      : { wordCount: 0, characterCount: 0 };
+
+    // � Insert or update transcription
+    const { error: insertError } = await supabase.from("transcriptions").insert({
+      session_id: sessionId,
+      text: validatedPayload.text || null,
+      status: validatedPayload.status,
+      assembly_ai_job_id: validatedPayload.id || validatedPayload.transcript_id,
+      confidence: validatedPayload.confidence || null,
+      language_code: validatedPayload.language_code || "en",
+      word_count: wordCount,
+      character_count: characterCount,
+      audio_duration_ms: validatedPayload.audio_duration
+        ? validatedPayload.audio_duration * 1000
+        : null,
+    });
+
+    if (insertError) throw insertError;
+
+    console.log("✅ Transcription inserted successfully:", validatedPayload.id);
+
+    // (Optional) Log locally for debugging
+    const logPath = path.join(process.cwd(), "logs");
+    await fs.mkdir(logPath, { recursive: true });
+    await fs.writeFile(
+      path.join(logPath, `callback-${sessionId}.json`),
+      JSON.stringify(payload, null, 2)
+    );
+
+    return NextResponse.json({
+      success: true,
+      message: "Transcription saved",
+      sessionId,
+      jobId: validatedPayload.id,
+      status: validatedPayload.status,
+    });
+  } catch (err) {
+    console.error("❌ Callback processing error:", err);
+    return NextResponse.json(
+      { success: false, error: err instanceof Error ? err.message : String(err) },
+      { status: 500 }
+    );
   }
 }
