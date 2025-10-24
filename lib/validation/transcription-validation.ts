@@ -3,13 +3,14 @@ import type { Transcription, TranscriptionValidationResult } from "@/lib/types/t
 
 export const TranscriptionValidator = {
   schema: z.object({
-    id: z.string().optional(),
+    id: z.string(),
     transcript_id: z.string().optional(),
     status: z.string(),
-    text: z.string().optional(),
-    confidence: z.number().optional(),
-    language_code: z.string().optional(),
-    audio_duration: z.number().optional(),
+    text: z.string(),
+    confidence: z.number(),
+    language_code: z.string(),
+    audio_duration: z.number(),
+    audio_url: z.string(),
     words: z.array(
       z.object({
         text: z.string(),
@@ -19,7 +20,10 @@ export const TranscriptionValidator = {
         speaker: z.string().nullable()
       })
     ).optional(),
-  }),
+    webhook_url: z.string().optional(),
+    webhook_status_code: z.number().optional(),
+    error: z.string().optional()
+  }).passthrough(), // Allow additional fields from AssemblyAI
 
   validateTranscription(data: Partial<Transcription>): TranscriptionValidationResult {
     const errors: string[] = []

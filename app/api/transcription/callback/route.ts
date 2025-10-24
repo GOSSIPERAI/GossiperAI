@@ -415,24 +415,34 @@ export async function POST(req: NextRequest) {
       if (createErr) throw createErr;
     }
 
+    // 🔍 Debug log the text content
+    console.log("🔍 [DEBUG] Validated payload text content:", {
+      hasText: !!validatedPayload.text,
+      textLength: validatedPayload.text?.length || 0,
+      textPreview: validatedPayload.text?.substring(0, 100) + "...",
+      status: validatedPayload.status
+    });
+
     // 🧮 Compute text metrics if text is available
     const { wordCount, characterCount } = validatedPayload.text
       ? TranscriptionValidator.calculateTextMetrics(validatedPayload.text)
       : { wordCount: 0, characterCount: 0 };
 
-    // � Insert or update transcription
+    // 💾 Insert or update transcription with complete data
     const { error: insertError } = await supabase.from("transcriptions").insert({
       session_id: sessionId,
-      text: validatedPayload.text || null,
+      text: validatedPayload.text, // Complete transcription text
       status: validatedPayload.status,
       assembly_ai_job_id: validatedPayload.id || validatedPayload.transcript_id,
-      confidence: validatedPayload.confidence || null,
-      language_code: validatedPayload.language_code || "en",
+      confidence: validatedPayload.confidence,
+      language_code: validatedPayload.language_code,
       word_count: wordCount,
       character_count: characterCount,
-      audio_duration_ms: validatedPayload.audio_duration
-        ? validatedPayload.audio_duration * 1000
-        : null,
+      audio_duration_ms: validatedPayload.audio_duration * 1000,
+      audio_url: validatedPayload.audio_url,
+      raw_words: validatedPayload.words, // Store word-level data
+      webhook_status_code: validatedPayload.webhook_status_code,
+      error_message: validatedPayload.error
     });
 
     if (insertError) throw insertError;
