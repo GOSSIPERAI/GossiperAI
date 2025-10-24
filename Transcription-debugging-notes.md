@@ -22,7 +22,7 @@
 
 ### 🔍 Current Flow Analysis:
 
-```
+\`\`\`
 1. Lecturer triggers mock transcription ✅
    → Returns: {success: true, jobId: 'mock-1758672864602-g32hacr8v'}
 
@@ -39,7 +39,7 @@
 
 5. React renders transcriptions ⚠️
    → Warning: duplicate keys (same job ID used for all)
-```
+\`\`\`
 
 ### 🛠️ Fixes Needed:
 

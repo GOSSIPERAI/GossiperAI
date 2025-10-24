@@ -1,10 +1,27 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ArrowRight, Users, Globe, Zap, Shield, Headphones, Languages, Volume2, Mic, Play, Pause } from "lucide-react"
-import Link from "next/link"
-import Image from "next/image"
-import { MainNavigation } from "@/components/main-navigation"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  ArrowRight,
+  Users,
+  Globe,
+  Zap,
+  Shield,
+  Headphones,
+  Languages,
+  Volume2,
+  Mic,
+  Play,
+  Pause,
+} from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { MainNavigation } from "@/components/main-navigation";
 
 export default function HomePage() {
   return (
@@ -21,21 +38,33 @@ export default function HomePage() {
                   AI-Powered Accessibility
                 </Badge>
                 <h1 className="text-4xl lg:text-6xl font-bold text-balance leading-tight">
-                  Real-Time Captions & Translation for <span className="text-primary">Everyone</span>
+                  Real-Time Captions & Translation for{" "}
+                  <span className="text-primary">Everyone</span>
                 </h1>
                 <p className="text-xl text-muted-foreground text-pretty max-w-2xl">
-                  Break down language barriers in education. Gossiper provides AI-powered real-time captioning and
-                  translation, making classrooms accessible for deaf, hard-of-hearing, and international students.
+                  Break down language barriers in education. Gossiper provides
+                  AI-powered real-time captioning and translation, making
+                  classrooms accessible for deaf, hard-of-hearing, and
+                  international students.
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="text-lg px-8 hover:bg-black" asChild>
+                <Button
+                  size="lg"
+                  className="text-lg px-8 hover:bg-black"
+                  asChild
+                >
                   <Link href="/join-session">
                     Join a Session
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="text-lg px-8 bg-transparent" asChild>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="text-lg px-8 bg-transparent"
+                  asChild
+                >
                   <Link href="/create-session">Create Session</Link>
                 </Button>
               </div>
@@ -50,21 +79,27 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="relative">
               <div className="relative bg-card border border-border rounded-2xl p-6 shadow-2xl">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-card-foreground">Live Lecture - Physics 101</h3>
+                    <h3 className="font-semibold text-card-foreground">
+                      Live Lecture - Physics 101
+                    </h3>
                     <Badge variant="secondary">English → Yoruba</Badge>
                   </div>
                   <div className="space-y-3">
                     <div className="bg-muted rounded-lg p-3">
                       <p className="text-sm text-muted-foreground">Original:</p>
-                      <p className="font-medium">"Today we'll explore Newton's laws of motion..."</p>
+                      <p className="font-medium">
+                        "Today we'll explore Newton's laws of motion..."
+                      </p>
                     </div>
                     <div className="bg-accent/20 rounded-lg p-3 border border-accent">
-                      <p className="text-sm text-accent-foreground/70">Translation:</p>
+                      <p className="text-sm text-accent-foreground/70">
+                        Translation:
+                      </p>
                       <p className="font-medium text-accent-foreground">
                         "Loni a o yoo ṣawari awọn ofin Newton ti iṣipopada..."
                       </p>
@@ -72,7 +107,6 @@ export default function HomePage() {
                   </div>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>12 students connected</span>
-                    <span>₦50 pool goal: 80% funded</span>
                   </div>
                 </div>
               </div>
@@ -85,10 +119,12 @@ export default function HomePage() {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-balance">Accessibility Meets Innovation</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold text-balance">
+              Accessibility Meets Innovation
+            </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-pretty">
-              Gossiper combines cutting-edge AI with blockchain technology to create an inclusive educational experience
-              for all students.
+              Gossiper combines cutting-edge AI with blockchain technology to
+              create an inclusive educational experience for all students.
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -99,7 +135,8 @@ export default function HomePage() {
                 </div>
                 <CardTitle>Real-Time Translation</CardTitle>
                 <CardDescription>
-                  Instant translation to 50+ languages including Yoruba, French, Spanish, and more.
+                  Instant translation to 50+ languages including Yoruba, French,
+                  Spanish, and more.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -110,7 +147,8 @@ export default function HomePage() {
                 </div>
                 <CardTitle>Lightning Fast</CardTitle>
                 <CardDescription>
-                  Sub-second latency ensures you never miss a word with our optimized AI pipeline.
+                  Sub-second latency ensures you never miss a word with our
+                  optimized AI pipeline.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -121,7 +159,8 @@ export default function HomePage() {
                 </div>
                 <CardTitle>Base-Powered</CardTitle>
                 <CardDescription>
-                  Sustainable micro-payments via Base Pay. Students contribute as little as ₦50 ($0.10).
+                  Sustainable micro-payments via Base Pay. Students contribute
+                  as little as ₦50 ($0.10).
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -132,7 +171,8 @@ export default function HomePage() {
                 </div>
                 <CardTitle>Collaborative Funding</CardTitle>
                 <CardDescription>
-                  Class pooling allows students to collectively fund sessions, making it affordable for everyone.
+                  Class pooling allows students to collectively fund sessions,
+                  making it affordable for everyone.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -143,7 +183,8 @@ export default function HomePage() {
                 </div>
                 <CardTitle>Beyond Classrooms</CardTitle>
                 <CardDescription>
-                  Perfect for conferences, corporate training, podcasts, and live streaming events.
+                  Perfect for conferences, corporate training, podcasts, and
+                  live streaming events.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -154,7 +195,8 @@ export default function HomePage() {
                 </div>
                 <CardTitle>Accessibility First</CardTitle>
                 <CardDescription>
-                  WCAG 2.1 AA compliant with high contrast modes, font scaling, and screen reader support.
+                  WCAG 2.1 AA compliant with high contrast modes, font scaling,
+                  and screen reader support.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -171,10 +213,16 @@ export default function HomePage() {
                 Ready to Make Education Accessible?
               </h2>
               <p className="text-xl text-primary-foreground/90 text-pretty">
-                Join thousands of students and educators already using Gossiper to break down barriers in learning.
+                Join thousands of students and educators already using Gossiper
+                to break down barriers in learning.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white" asChild>
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white"
+                  asChild
+                >
                   <Link href="/signup">
                     Start Free Trial
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -214,27 +262,39 @@ export default function HomePage() {
               <span className="text-xl sm:text-2xl font-bold">Gossiper</span>
             </div>
             <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto md:mx-0 leading-relaxed">
-              Making education accessible through AI-powered real-time captions and translation.
+              Making education accessible through AI-powered real-time captions
+              and translation.
             </p>
           </div>
 
           {/* Navigation Links Grid - Mobile Optimized */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-8">
             <div className="text-center sm:text-left">
-              <h3 className="font-semibold mb-3 sm:mb-4 text-foreground">Product</h3>
+              <h3 className="font-semibold mb-3 sm:mb-4 text-foreground">
+                Product
+              </h3>
               <ul className="space-y-2 text-sm sm:text-base text-muted-foreground">
                 <li>
-                  <Link href="/features" className="hover:text-foreground transition-colors inline-block py-1">
+                  <Link
+                    href="/features"
+                    className="hover:text-foreground transition-colors inline-block py-1"
+                  >
                     Features
                   </Link>
                 </li>
                 <li>
-                  <Link href="/pricing" className="hover:text-foreground transition-colors inline-block py-1">
+                  <Link
+                    href="/pricing"
+                    className="hover:text-foreground transition-colors inline-block py-1"
+                  >
                     Pricing
                   </Link>
                 </li>
                 <li>
-                  <Link href="/demo" className="hover:text-foreground transition-colors inline-block py-1">
+                  <Link
+                    href="/demo"
+                    className="hover:text-foreground transition-colors inline-block py-1"
+                  >
                     Demo
                   </Link>
                 </li>
@@ -242,20 +302,31 @@ export default function HomePage() {
             </div>
 
             <div className="text-center sm:text-left">
-              <h3 className="font-semibold mb-3 sm:mb-4 text-foreground">Company</h3>
+              <h3 className="font-semibold mb-3 sm:mb-4 text-foreground">
+                Company
+              </h3>
               <ul className="space-y-2 text-sm sm:text-base text-muted-foreground">
                 <li>
-                  <Link href="/about" className="hover:text-foreground transition-colors inline-block py-1">
+                  <Link
+                    href="/about"
+                    className="hover:text-foreground transition-colors inline-block py-1"
+                  >
                     About
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contact" className="hover:text-foreground transition-colors inline-block py-1">
+                  <Link
+                    href="/contact"
+                    className="hover:text-foreground transition-colors inline-block py-1"
+                  >
                     Contact
                   </Link>
                 </li>
                 <li>
-                  <Link href="/careers" className="hover:text-foreground transition-colors inline-block py-1">
+                  <Link
+                    href="/careers"
+                    className="hover:text-foreground transition-colors inline-block py-1"
+                  >
                     Careers
                   </Link>
                 </li>
@@ -263,20 +334,31 @@ export default function HomePage() {
             </div>
 
             <div className="text-center sm:text-left sm:col-span-2 lg:col-span-1">
-              <h3 className="font-semibold mb-3 sm:mb-4 text-foreground">Support</h3>
+              <h3 className="font-semibold mb-3 sm:mb-4 text-foreground">
+                Support
+              </h3>
               <ul className="space-y-2 text-sm sm:text-base text-muted-foreground">
                 <li>
-                  <Link href="/help" className="hover:text-foreground transition-colors inline-block py-1">
+                  <Link
+                    href="/help"
+                    className="hover:text-foreground transition-colors inline-block py-1"
+                  >
                     Help Center
                   </Link>
                 </li>
                 <li>
-                  <Link href="/privacy" className="hover:text-foreground transition-colors inline-block py-1">
+                  <Link
+                    href="/privacy"
+                    className="hover:text-foreground transition-colors inline-block py-1"
+                  >
                     Privacy
                   </Link>
                 </li>
                 <li>
-                  <Link href="/terms" className="hover:text-foreground transition-colors inline-block py-1">
+                  <Link
+                    href="/terms"
+                    className="hover:text-foreground transition-colors inline-block py-1"
+                  >
                     Terms
                   </Link>
                 </li>
@@ -287,11 +369,12 @@ export default function HomePage() {
           {/* Copyright Section */}
           <div className="border-t border-border mt-8 sm:mt-12 pt-6 sm:pt-8 text-center">
             <p className="text-xs sm:text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} Gossiper. All rights reserved. Powered by Base.
+              &copy; {new Date().getFullYear()} Gossiper. All rights reserved.
+              Powered by Base.
             </p>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }

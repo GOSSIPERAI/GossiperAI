@@ -39,9 +39,9 @@ export function WalletMultiButtonWrapper({ className }: WalletMultiButtonWrapper
         >
           No wallet detected
         </Button>
-        <p className="text-xs text-muted-foreground text-center">
+        {/* <p className="text-xs text-muted-foreground text-center">
           Please install Phantom or Solflare wallet extension
-        </p>
+        </p> */}
       </div>
     )
   }
