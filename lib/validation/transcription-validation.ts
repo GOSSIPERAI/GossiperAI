@@ -21,7 +21,7 @@ export const TranscriptionValidator = {
       })
     ).optional(),
     webhook_url: z.string().optional(),
-    webhook_status_code: z.number().optional(),
+    webhook_status_code: z.number().nullable().optional(),
     error: z.string().optional()
   }).passthrough(), // Allow additional fields from AssemblyAI
 

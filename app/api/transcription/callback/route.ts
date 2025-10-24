@@ -20,7 +20,7 @@ interface AssemblyAIResponse {
   language_code?: string;
   audio_duration?: number;
   audio_url?: string;
-  webhook_status_code?: number;
+  webhook_status_code?: number | null;
 }
 
 // Minimal webhook payload validation schema

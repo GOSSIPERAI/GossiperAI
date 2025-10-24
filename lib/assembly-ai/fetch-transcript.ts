@@ -1,4 +1,4 @@
-import { env } from "../../env.mjs";
+import { env } from "@/env.mjs";
 
 /**
  * Fetches the complete transcript data from AssemblyAI API
