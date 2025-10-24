@@ -47,20 +47,53 @@ export async function POST(req: NextRequest) {
     const validatedPayload = validation.data;
 
     // ✅ Ensure the session exists before inserting
+    console.log("🔍 [DEBUG] Checking session existence:", sessionId);
     const { data: existingSession, error: sessionError } = await supabase
       .from("sessions")
-      .select("id")
+      .select("id, created_at")
       .eq("id", sessionId)
       .maybeSingle();
 
-    if (sessionError) throw sessionError;
+    if (sessionError) {
+      console.error("❌ Failed to check session:", {
+        error: sessionError,
+        sessionId
+      });
+      throw sessionError;
+    }
 
     if (!existingSession) {
-      console.warn("⚠️ Session not found — auto-creating session for:", sessionId);
-      const { error: createErr } = await supabase
+      console.warn("⚠️ Session not found — auto-creating:", sessionId);
+      const timestamp = new Date().toISOString();
+      const { data: newSession, error: createErr } = await supabase
         .from("sessions")
-        .insert({ id: sessionId, created_at: new Date().toISOString() });
-      if (createErr) throw createErr;
+        .insert({ 
+          id: sessionId, 
+          created_at: timestamp,
+          updated_at: timestamp,
+          status: 'active'  // Add default status if your sessions table has this
+        })
+        .select()
+        .single();
+
+      if (createErr) {
+        console.error("❌ Failed to create session:", {
+          error: createErr,
+          sessionId
+        });
+        throw createErr;
+      }
+
+      console.log("✅ Created new session:", {
+        sessionId,
+        timestamp,
+        session: newSession
+      });
+    } else {
+      console.log("✅ Found existing session:", {
+        sessionId,
+        createdAt: existingSession.created_at
+      });
     }
 
     // Extract job ID and full text from payload
