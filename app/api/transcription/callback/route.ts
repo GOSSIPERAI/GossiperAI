@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     const payload = await req.json();
 
     // 🔍 Validate the webhook payload with Zod
-    const validation = TranscriptionValidator.safeParse(payload);
+    const validation = TranscriptionValidator.schema.safeParse(payload);
     if (!validation.success) {
       console.error("❌ Invalid AssemblyAI payload:", validation.error.format());
       return NextResponse.json(
