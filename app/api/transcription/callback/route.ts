@@ -2,8 +2,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase-server";
 import { TranscriptionValidator } from "@/lib/validation/transcription-validation";
-import fs from "fs/promises";
-import path from "path";
 
 // UUID validation helper
 function isValidUUID(uuid: string) {
@@ -35,7 +33,7 @@ export async function POST(req: NextRequest) {
     const payload = await req.json();
 
     // 🔍 Validate the webhook payload with Zod
-    const validation = TranscriptionValidator.schema.safeParse(payload);
+    const validation = TranscriptionValidator.safeParse(payload);
     if (!validation.success) {
       console.error("❌ Invalid AssemblyAI payload:", validation.error.format());
       return NextResponse.json(
@@ -157,14 +155,23 @@ export async function POST(req: NextRequest) {
     }
 
     console.log("✅ Transcription inserted successfully:", validatedPayload.id);
-
-    // (Optional) Log locally for debugging
-    const logPath = path.join(process.cwd(), "logs");
-    await fs.mkdir(logPath, { recursive: true });
-    await fs.writeFile(
-      path.join(logPath, `callback-${sessionId}.json`),
-      JSON.stringify(payload, null, 2)
-    );
+    
+    // Detailed debug logging for Vercel
+    console.log("📝 [DEBUG] Callback payload:", {
+      sessionId,
+      jobId,
+      status: validatedPayload.status,
+      text: text?.substring(0, 100) + "...",
+      metrics: {
+        wordCount,
+        characterCount
+      },
+      words: {
+        present: !!validatedPayload.words,
+        count: validatedPayload.words?.length ?? 0
+      },
+      fullPayload: JSON.stringify(payload, null, 2)
+    });
 
     return NextResponse.json({
       success: true,
