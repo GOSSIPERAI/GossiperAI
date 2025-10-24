@@ -5,17 +5,34 @@ import { TranscriptionValidator } from "@/lib/validation/transcription-validatio
 import fs from "fs/promises";
 import path from "path";
 
+// UUID validation helper
+function isValidUUID(uuid: string) {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(uuid);
+}
+
 export async function POST(req: NextRequest) {
+  // Initialize Supabase client with validation
   const supabase = createServiceRoleSupabaseClient();
+  if (!supabase) {
+    console.error("❌ Failed to initialize Supabase client");
+    return NextResponse.json(
+      { error: "Database connection failed" },
+      { status: 500 }
+    );
+  }
 
   try {
     const { searchParams } = new URL(req.url);
     const sessionId = searchParams.get("sessionId");
-    const payload = await req.json();
 
-    if (!sessionId) {
-      return NextResponse.json({ error: "Missing sessionId" }, { status: 400 });
+    // Validate sessionId format
+    if (!sessionId || !isValidUUID(sessionId)) {
+      console.error("❌ Invalid sessionId format:", sessionId);
+      return NextResponse.json({ error: "Invalid sessionId format" }, { status: 400 });
     }
+
+    const payload = await req.json();
 
     // 🔍 Validate the webhook payload with Zod
     const validation = TranscriptionValidator.safeParse(payload);
@@ -93,7 +110,18 @@ export async function POST(req: NextRequest) {
       { onConflict: "assembly_ai_job_id" }
     );
 
-    if (insertError) throw insertError;
+    if (insertError) {
+      console.error("❌ Database insertion failed:", {
+        error: insertError,
+        payload: {
+          session_id: sessionId,
+          text: text?.substring(0, 100),
+          status: validatedPayload.status,
+          assembly_ai_job_id: jobId
+        }
+      });
+      throw insertError;
+    }
 
     console.log("✅ Transcription inserted successfully:", validatedPayload.id);
 

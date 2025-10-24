@@ -3,14 +3,14 @@ import type { Transcription, TranscriptionValidationResult } from "@/lib/types/t
 
 export const TranscriptionValidator = {
   schema: z.object({
-    id: z.string().optional(),
-    transcript_id: z.string().optional(),
-    status: z.string().optional(),
+    id: z.string(),  // Required
+    status: z.string(), // Required
     text: z.string().optional(),
     confidence: z.number().optional(),
     language_code: z.string().optional(),
     audio_duration: z.number().optional(),
     audio_url: z.string().optional(),
+    transcript_id: z.string().optional(),
     words: z.array(
       z.object({
         text: z.string(),
