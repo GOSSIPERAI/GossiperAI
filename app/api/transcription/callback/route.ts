@@ -1,7 +1,79 @@
-
 import { type NextRequest, NextResponse } from "next/server";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase-server";
 import { TranscriptionValidator } from "@/lib/validation/transcription-validation";
+import { z } from "zod";
+
+// Validate required environment variables
+const ASSEMBLYAI_API_KEY = process.env.ASSEMBLYAI_API_KEY;
+if (!ASSEMBLYAI_API_KEY) {
+  throw new Error("ASSEMBLYAI_API_KEY environment variable is not set");
+}
+
+interface AssemblyAIResponse {
+  id: string;
+  transcript_id: string;
+  status: string;
+  text: string;
+  words?: Array<{ text: string }>;
+  error?: string;
+  confidence?: number;
+  language_code?: string;
+  audio_duration?: number;
+  audio_url?: string;
+  webhook_status_code?: number;
+}
+
+// Minimal webhook payload validation schema
+const WebhookPayloadSchema = z.object({
+  transcript_id: z.string(),
+  status: z.string()
+});
+
+// Utility function for delayed retry
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Fetch transcript with retry logic
+async function fetchTranscript(jobId: string, maxRetries = 3): Promise<AssemblyAIResponse> {
+  let lastError: Error | null = null;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`🔄 [Attempt ${attempt}] Fetching transcript ${jobId}`);
+      
+      // Ensure API key is defined
+      if (!ASSEMBLYAI_API_KEY) {
+        throw new Error("AssemblyAI API key is not defined");
+      }
+
+      const response = await fetch(`https://api.assemblyai.com/v2/transcript/${jobId}`, {
+        headers: {
+          "Authorization": ASSEMBLYAI_API_KEY,
+          "Content-Type": "application/json"
+        } as const
+      });
+
+      if (!response.ok) {
+        throw new Error(`AssemblyAI API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json() as AssemblyAIResponse;
+      
+      if (data.status === "error") {
+        throw new Error(data.error || "Unknown AssemblyAI error");
+      }
+
+      return data;
+    } catch (error) {
+      lastError = error as Error;
+      if (attempt < maxRetries) {
+        await sleep(1000); // Wait 1 second between retries
+        continue;
+      }
+    }
+  }
+  
+  throw lastError;
+}
 
 // UUID validation helper
 function isValidUUID(uuid: string) {
@@ -32,12 +104,43 @@ export async function POST(req: NextRequest) {
 
     const payload = await req.json();
 
-    // 🔍 Validate the webhook payload with Zod
-    const validation = TranscriptionValidator.safeParse(payload);
-    if (!validation.success) {
-      console.error("❌ Invalid AssemblyAI payload:", validation.error.format());
+    // 🔍 Validate the minimal webhook payload
+    const webhookValidation = WebhookPayloadSchema.safeParse(payload);
+    if (!webhookValidation.success) {
+      console.error("❌ Invalid webhook payload:", webhookValidation.error.format());
       return NextResponse.json(
-        { error: "Invalid payload", details: validation.error.format() },
+        { error: "Invalid webhook payload", details: webhookValidation.error.format() },
+        { status: 400 }
+      );
+    }
+
+    const webhookData = webhookValidation.data;
+    console.log("✅ Received webhook:", { 
+      transcript_id: webhookData.transcript_id,
+      status: webhookData.status 
+    });
+
+    // Fetch full transcript if status is completed
+    let fullTranscript;
+    if (webhookData.status === "completed") {
+      try {
+        fullTranscript = await fetchTranscript(webhookData.transcript_id);
+        console.log("✅ Fetched full transcript");
+      } catch (error) {
+        console.error("❌ Failed to fetch full transcript:", error);
+        return NextResponse.json(
+          { error: "Failed to fetch transcript data" },
+          { status: 500 }
+        );
+      }
+    }
+
+    // Validate the full transcript data
+    const validation = TranscriptionValidator.safeParse(fullTranscript || payload);
+    if (!validation.success) {
+      console.error("❌ Invalid AssemblyAI data:", validation.error.format());
+      return NextResponse.json(
+        { error: "Invalid transcript data", details: validation.error.format() },
         { status: 400 }
       );
     }
@@ -117,7 +220,47 @@ export async function POST(req: NextRequest) {
       ? TranscriptionValidator.calculateTextMetrics(text)
       : { wordCount: 0, characterCount: 0 };
 
-    // 💾 Insert or update transcription with upsert
+    // � Debug AssemblyAI payload before upsert
+    console.log("🔍 [DEBUG] Pre-upsert field validation:", {
+      assemblyAI: {
+        id: validatedPayload.id,
+        transcript_id: validatedPayload.transcript_id,
+        status: validatedPayload.status,
+        raw_text: validatedPayload.text,
+        computed_text: text,
+        confidence: validatedPayload.confidence,
+        language_code: validatedPayload.language_code,
+        audio_duration: validatedPayload.audio_duration,
+        has_words: !!validatedPayload.words,
+        word_count: validatedPayload.words?.length,
+        audio_url: validatedPayload.audio_url,
+        webhook_status_code: validatedPayload.webhook_status_code
+      }
+    });
+
+    // �💾 Insert or update transcription with upsert
+    const upsertData = {
+      session_id: sessionId,
+      text,
+      status: validatedPayload.status,
+      assembly_ai_job_id: jobId,
+      confidence: validatedPayload.confidence ?? null,
+      language_code: validatedPayload.language_code ?? "en",
+      word_count: wordCount,
+      character_count: characterCount,
+      audio_duration_ms: validatedPayload.audio_duration
+        ? Math.round(validatedPayload.audio_duration * 1000)
+        : null,
+      error_message: validatedPayload.error ?? null,
+      raw_words: validatedPayload.words
+        ? JSON.stringify(validatedPayload.words)
+        : null,
+      audio_url: validatedPayload.audio_url ?? null,
+      webhook_status_code: validatedPayload.webhook_status_code ?? null,
+    };
+
+    console.log("💾 [DEBUG] Upserting data:", JSON.stringify(upsertData, null, 2));
+
     const { error: insertError } = await supabase.from("transcriptions").upsert(
       {
         session_id: sessionId,
@@ -138,7 +281,10 @@ export async function POST(req: NextRequest) {
         audio_url: validatedPayload.audio_url ?? null,
         webhook_status_code: validatedPayload.webhook_status_code ?? null,
       },
-      { onConflict: "assembly_ai_job_id" }
+      { 
+        onConflict: "assembly_ai_job_id",
+        ignoreDuplicates: false // Force update on conflict
+      }
     );
 
     if (insertError) {
