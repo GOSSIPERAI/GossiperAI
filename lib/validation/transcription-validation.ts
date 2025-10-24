@@ -1,16 +1,16 @@
-import { z } from "zod";
+import { optional, z } from "zod";
 import type { Transcription, TranscriptionValidationResult } from "@/lib/types/transcription"
 
 export const TranscriptionValidator = {
   schema: z.object({
-    id: z.string(),
+    id: z.string().optional(),
     transcript_id: z.string().optional(),
-    status: z.string(),
-    text: z.string(),
-    confidence: z.number(),
-    language_code: z.string(),
-    audio_duration: z.number(),
-    audio_url: z.string(),
+    status: z.string().optional(),
+    text: z.string().optional(),
+    confidence: z.number().optional(),
+    language_code: z.string().optional(),
+    audio_duration: z.number().optional(),
+    audio_url: z.string().optional(),
     words: z.array(
       z.object({
         text: z.string(),
