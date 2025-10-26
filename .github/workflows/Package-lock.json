@@ -1,0 +1,33 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  regen-lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Clean workspace
+        run: |
+          rm -rf node_modules package-lock.json
+
+      - name: Install dependencies (npm)
+        run: |
+          npm ci
+      - name: Run build (to ensure native binaries are fetched)
+        run: |
+          npm run build
+
+      - name: Commit lockfile
+        run: |
+          git add package-lock.json
+          git commit -m "chore: regenerate package-lock.json on linux for native bindings" || echo "no changes to commit"
+          git push
