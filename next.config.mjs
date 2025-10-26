@@ -38,6 +38,11 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  //lightning css optimization is causing issues with some styles, disabling for now
+ /* experimental: {
+    optimizeCss: false,
+
+  },*/
   async headers() {
     return [
       {
