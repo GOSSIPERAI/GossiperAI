@@ -1,0 +1,23 @@
+{
+  "browser": {
+    "browserName": "chromium",
+    "userDataDir": "/Users/abba/Library/Application Support/Google/Chrome/Default",
+    "launchOptions": {
+      "channel": "chrome",
+      "headless": false
+    },
+    "contextOptions": {
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      }
+    }
+  },
+  "server": {
+    "port": 8931,
+    "host": "localhost"
+  },
+  "capabilities": ["tabs", "install", "pdf", "vision"],
+  "outputDir": "/Users/abba/Desktop/gossiper/playwright-output",
+  "imageResponses": "allow"
+}

@@ -11,6 +11,10 @@ export interface TranscriptionResult {
   audioUrl?: string
 }
 
+/**
+ * @deprecated This hook uses polling and has been replaced by useRealtimeTranscriptions
+ * which uses Supabase Realtime for instant updates. Use useRealtimeTranscriptions instead.
+ */
 interface UseTranscriptionOptions {
   sessionId: string
   enabled?: boolean

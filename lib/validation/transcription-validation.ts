@@ -1,13 +1,31 @@
-// Transcription Validation Utilities
-// Simple, maintainable validation logic for transcription data
-
+import { optional, z } from "zod";
 import type { Transcription, TranscriptionValidationResult } from "@/lib/types/transcription"
 
-export class TranscriptionValidator {
-  /**
-   * Validates transcription data before database insertion
-   */
-  static validateTranscription(data: Partial<Transcription>): TranscriptionValidationResult {
+export const TranscriptionValidator = {
+  schema: z.object({
+    id: z.string().optional(),
+    status: z.string().optional(),
+    text: z.string().optional(),
+    confidence: z.number().optional(),
+    language_code: z.string().optional(),
+    audio_duration: z.number().optional(),
+    audio_url: z.string().optional(),
+    transcript_id: z.string().optional(),
+    words: z.array(
+      z.object({
+        text: z.string(),
+        start: z.number(),
+        end: z.number(),
+        confidence: z.number(),
+        speaker: z.string().nullable()
+      })
+    ).optional(),
+    webhook_url: z.string().optional(),
+    webhook_status_code: z.number().nullable().optional(),
+    error: z.string().optional()
+  }).passthrough(), // Allow additional fields from AssemblyAI
+
+  validateTranscription(data: Partial<Transcription>): TranscriptionValidationResult {
     const errors: string[] = []
     const warnings: string[] = []
 
@@ -55,12 +73,9 @@ export class TranscriptionValidator {
       errors,
       warnings,
     }
-  }
+  },
 
-  /**
-   * Validates text quality
-   */
-  static validateTextQuality(text: string): TranscriptionValidationResult {
+  validateTextQuality(text: string): TranscriptionValidationResult {
     const errors: string[] = []
     const warnings: string[] = []
 
@@ -90,12 +105,9 @@ export class TranscriptionValidator {
       errors,
       warnings,
     }
-  }
+  },
 
-  /**
-   * Calculates text metrics
-   */
-  static calculateTextMetrics(text: string): { wordCount: number; characterCount: number } {
+  calculateTextMetrics(text: string): { wordCount: number; characterCount: number } {
     const wordCount = text
       .trim()
       .split(/\s+/)
@@ -103,5 +115,9 @@ export class TranscriptionValidator {
     const characterCount = text.length
 
     return { wordCount, characterCount }
+  },
+
+  safeParse(data: unknown) {
+    return this.schema.safeParse(data);
   }
 }

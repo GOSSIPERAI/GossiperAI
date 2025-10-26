@@ -49,8 +49,8 @@ Students join lecture sessions and get live captions in their language. They pay
 ### Requirements
 
 - Node.js 18+
-- pnpm
-- Solana wallet (Phantom or Solflare)
+- npm
+- Metamask wallet 
 - AssemblyAI API key
 
 ### Install

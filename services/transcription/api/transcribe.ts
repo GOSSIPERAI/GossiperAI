@@ -113,10 +113,13 @@ export default async function handler(
       );
     }
 
-    // Submit transcription job
+    // Submit transcription job with our existing callback route
+    // AssemblyAI will call our callback route, which stores in database
+    const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://your-domain.com'}/api/transcription/callback?sessionId=${encodeURIComponent(callbackUrl)}`;
+    
     const result = await AssemblyAIService.submitTranscriptionJob(
       audioUrl!,
-      callbackUrl,
+      webhookUrl,
       languageCode
     );
 

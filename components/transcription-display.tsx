@@ -16,6 +16,10 @@ import {
 } from "lucide-react"
 import { useTranscription, type TranscriptionResult } from "@/hooks/use-transcription"
 
+/**
+ * @deprecated This component uses polling and has been replaced by RealtimeTranscriptionDisplay
+ * which uses Supabase Realtime for instant updates. Use RealtimeTranscriptionDisplay instead.
+ */
 interface TranscriptionDisplayProps {
   sessionId: string
   selectedLanguage: string

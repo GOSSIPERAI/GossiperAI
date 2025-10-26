@@ -3,6 +3,13 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { SecurityHeaders } from '@/lib/auth-security'
 
 export async function middleware(request: NextRequest) {
+  // 🚦 Allow unauthenticated AssemblyAI webhook calls to pass through immediately
+if (request.nextUrl.pathname.startsWith('/api/transcription/callback')) {
+  console.log('🪶 [MIDDLEWARE] Bypassing auth for AssemblyAI webhook')
+  return NextResponse.next()
+}
+
+  // Proceed with normal middleware logic
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -76,6 +83,7 @@ export async function middleware(request: NextRequest) {
     '/auth/callback', //added this
     '/auth',
     '/api',
+    '/api/transcription/callback', // AssemblyAI webhook endpoint
     '/',
     '/features',
     '/pricing',

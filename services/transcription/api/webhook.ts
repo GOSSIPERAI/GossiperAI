@@ -1,4 +1,4 @@
-// api/webhook.ts
+/*api/webhook.ts
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import { HttpClient, Logger, ErrorHandler } from '../lib/assemblyai';
@@ -41,11 +41,9 @@ export default async function handler(
       confidence: payload.confidence,
     });
 
-    // Extract callback URL from headers or query params
-    // AssemblyAI doesn't provide the original callback URL in the webhook,
-    // but we can extract it from custom headers if needed
-    const callbackUrl = req.headers['x-callback-url'] as string || 
-                       req.query.callbackUrl as string;
+    // Extract callback URL from query params
+    // We pass the client's callback URL as a query parameter when submitting to AssemblyAI
+    const callbackUrl = req.query.callbackUrl as string;
 
     if (!callbackUrl) {
       Logger.error('No callback URL found in webhook request');
@@ -141,3 +139,4 @@ export async function handleWebhookWithCustomCallback(
     });
   }
 }
+*/
