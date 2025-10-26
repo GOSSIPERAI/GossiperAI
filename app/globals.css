@@ -1,6 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*@config './tailwind.config.js';*/
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
   /* Updated color tokens to match Gossiper brand colors */
