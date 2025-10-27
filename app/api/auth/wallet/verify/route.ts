@@ -5,7 +5,7 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'your-secret-key-change-in-production'
 )
-
+export const dynamic = 'force-dynamic'; // Ensure the route is always dynamic
 export async function GET(request: NextRequest) {
   try {
     // Get token from cookie

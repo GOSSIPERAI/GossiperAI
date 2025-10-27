@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 
+export const dynamic = 'force-dynamic'; // Ensure the route is always dynamic 
 export async function GET(request: NextRequest) {
   try {
     const supabase = createServerSupabaseClient()
