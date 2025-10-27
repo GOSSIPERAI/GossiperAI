@@ -1,4 +1,4 @@
-import { env } from "@/env.mjs";
+//import { env } from "@/env.mjs";
 
 /**
  * Fetches the complete transcript data from AssemblyAI API
@@ -10,7 +10,7 @@ export async function fetchTranscript(transcriptId: string) {
     `https://api.assemblyai.com/v2/transcript/${transcriptId}`,
     {
       headers: {
-        "Authorization": env.ASSEMBLYAI_API_KEY,
+        "Authorization": process.env.ASSEMBLYAI_API_KEY!,// changed env to process.env plus non-null assertion(!)
         "Content-Type": "application/json",
       },
     }
