@@ -192,9 +192,9 @@ export default function HelpPage() {
                         </li>
                       ))}
                     </ul>
-                    <Button variant="outline" className="w-full mt-6 bg-transparent">
+                    {/* <Button variant="outline" className="w-full mt-6 bg-transparent">
                       View All Articles
-                    </Button>
+                    </Button> */}
                   </CardContent>
                 </Card>
               )
@@ -254,7 +254,7 @@ export default function HelpPage() {
                 education experts.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white" asChild>
+                <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
                   <Link href="/contact">
                     Contact Support
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -263,7 +263,7 @@ export default function HelpPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="text-lg px-8 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent"
+                  className="text-lg px-8 border-primary-foreground/20 text-primary-foreground hover:text-secondary-foreground bg-transparent"
                   asChild
                 >
                   <Link href="/signup">Start Free Trial</Link>
@@ -278,7 +278,7 @@ export default function HelpPage() {
       <footer className="border-t border-border bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center text-muted-foreground">
-            <p>&copy; 2024 Gossiper. All rights reserved. Here to help you succeed.</p>
+            <p>&copy; {new Date().getFullYear()} Gossiper. All rights reserved. Here to help you succeed.</p>
           </div>
         </div>
       </footer>
