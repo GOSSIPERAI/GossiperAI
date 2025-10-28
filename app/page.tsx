@@ -51,7 +51,7 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
                   size="lg"
-                  className="text-lg px-8 hover:bg-black"
+                  className="text-lg px-8"
                   asChild
                 >
                   <Link href="/join-session">
@@ -62,7 +62,7 @@ export default function HomePage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="text-lg px-8 bg-transparent"
+                  className="text-lg px-8 bg-transparent hover:text-secondary-foreground"
                   asChild
                 >
                   <Link href="/create-session">Create Session</Link>
@@ -97,10 +97,10 @@ export default function HomePage() {
                       </p>
                     </div>
                     <div className="bg-accent/20 rounded-lg p-3 border border-accent">
-                      <p className="text-sm text-accent-foreground/70">
+                      <p className="text-sm ">
                         Translation:
                       </p>
-                      <p className="font-medium text-accent-foreground">
+                      <p className="font-medium ">
                         "Loni a o yoo ṣawari awọn ofin Newton ti iṣipopada..."
                       </p>
                     </div>
@@ -220,7 +220,7 @@ export default function HomePage() {
                 <Button
                   size="lg"
                   variant="secondary"
-                  className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white"
+                  className="text-lg px-8 "
                   asChild
                 >
                   <Link href="/signup">
@@ -231,7 +231,7 @@ export default function HomePage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="text-lg px-8 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent"
+                  className="text-lg px-8 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 hover:text-secondary-foreground bg-transparent"
                   asChild
                 >
                   <Link href="/demo">Watch Demo</Link>

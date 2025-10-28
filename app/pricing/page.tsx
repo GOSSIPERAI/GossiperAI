@@ -125,7 +125,7 @@ export default function PricingPage() {
                         </li>
                       ))}
                     </ul>
-                    <Button className="w-full" variant={plan.popular ? "default" : "outline"} asChild>
+                    <Button className="w-full hover:text-secondary-foreground" variant={plan.popular ? "default" : "outline"} asChild>
                       <Link href={plan.name === "Institution" ? "/contact" : "/signup"}>
                         {plan.cta}
                         <ArrowRight className="ml-2 h-4 w-4" />
@@ -238,7 +238,7 @@ export default function PricingPage() {
                 Join thousands of students and educators making education accessible for everyone.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white" asChild>
+                <Button size="lg" variant="secondary" className="text-lg px-8 " asChild>
                   <Link href="/signup">
                     Start Free Trial
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -247,7 +247,7 @@ export default function PricingPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="text-lg px-8 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent"
+                  className="text-lg px-8 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent hover:text-secondary-foreground"
                   asChild
                 >
                   <Link href="/contact">Contact Sales</Link>

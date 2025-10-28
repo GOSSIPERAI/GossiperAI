@@ -39,7 +39,7 @@ export default function FeaturesPage() {
               Gossiper combines cutting-edge AI technology with thoughtful design to create the most comprehensive
               real-time captioning and translation platform for education.
             </p>
-            <Button size="lg" className="text-lg px-8 hover:bg-black" asChild>
+            <Button size="lg" className="text-lg px-8" asChild>
               <Link href="/signup">
                 Start Free Trial
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -290,7 +290,7 @@ export default function FeaturesPage() {
                 Join educators worldwide who are making their content accessible to every student.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white" asChild>
+                <Button size="lg" variant="secondary" className="text-lg px-8 " asChild>
                   <Link href="/signup">
                     Start Free Trial
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -299,7 +299,7 @@ export default function FeaturesPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="text-lg px-8 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent"
+                  className="text-lg px-8 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent hover:text-secondary-foreground"
                   asChild
                 >
                   <Link href="/pricing">View Pricing</Link>
