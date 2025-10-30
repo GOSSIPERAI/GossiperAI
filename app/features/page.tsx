@@ -32,14 +32,14 @@ export default function FeaturesPage() {
             <Badge variant="secondary" className="w-fit mx-auto">
               Comprehensive Feature Set
             </Badge>
-            <h1 className="text-4xl lg:text-6xl font-bold text-balance">
+            <h1 className="text-4xl lg:text-6xl font-bold text-balance text-foreground">
               Everything You Need for <span className="text-primary">Accessible Education</span>
             </h1>
             <p className="text-xl text-muted-foreground text-pretty">
               Gossiper combines cutting-edge AI technology with thoughtful design to create the most comprehensive
               real-time captioning and translation platform for education.
             </p>
-            <Button size="lg" className="text-lg px-8 hover:bg-black" asChild>
+            <Button size="lg" className="text-lg px-8" asChild>
               <Link href="/signup">
                 Start Free Trial
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -53,7 +53,7 @@ export default function FeaturesPage() {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-balance">Core Features</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold text-balance text-foreground">Core Features</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-pretty">
               Built from the ground up to support diverse learning environments and accessibility needs.
             </p>
@@ -104,9 +104,9 @@ export default function FeaturesPage() {
                 <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                   <Shield className="h-6 w-6 text-primary" />
                 </div>
-                <CardTitle>Solana-Powered Payments</CardTitle>
+                <CardTitle>Base-Powered Payments</CardTitle>
                 <CardDescription>
-                  Sustainable micro-payments via Solana Pay. Students contribute as little as ₦50 with minimal
+                  Sustainable micro-payments via Base Pay. Students contribute as little as ₦50 with minimal
                   transaction fees.
                 </CardDescription>
               </CardHeader>
@@ -142,7 +142,7 @@ export default function FeaturesPage() {
       </section>
 
       {/* Advanced Features */}
-      <section className="py-20">
+      <section className="py-20 text-foreground">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-balance">Advanced Capabilities</h2>
@@ -226,7 +226,7 @@ export default function FeaturesPage() {
       </section>
 
       {/* Accessibility Features */}
-      <section className="py-20 bg-muted/30">
+      <section className="py-20 bg-muted/30 text-foreground">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-balance">Accessibility First</h2>
@@ -290,7 +290,7 @@ export default function FeaturesPage() {
                 Join educators worldwide who are making their content accessible to every student.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white" asChild>
+                <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
                   <Link href="/signup">
                     Start Free Trial
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -299,7 +299,7 @@ export default function FeaturesPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="text-lg px-8 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent"
+                  className="text-lg px-8 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent hover:text-foreground"
                   asChild
                 >
                   <Link href="/pricing">View Pricing</Link>
@@ -311,7 +311,7 @@ export default function FeaturesPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-muted/30">
+      <footer className="border-t border-border bg-muted/30 text-foreground">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="space-y-4">
@@ -395,7 +395,7 @@ export default function FeaturesPage() {
             </div>
           </div>
           <div className="border-t border-border mt-12 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2024 Gossiper. All rights reserved. Powered by Solana.</p>
+            <p>&copy; {new Date().getFullYear()}. All rights reserved. Powered by Base.</p>
           </div>
         </div>
       </footer>

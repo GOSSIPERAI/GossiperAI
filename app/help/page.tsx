@@ -93,7 +93,7 @@ export default function HelpPage() {
             <Badge variant="secondary" className="w-fit mx-auto">
               Help Center
             </Badge>
-            <h1 className="text-4xl lg:text-6xl font-bold text-balance">
+            <h1 className="text-4xl lg:text-6xl font-bold text-balance text-foreground">
               How can we <span className="text-primary">help you</span> today?
             </h1>
             <p className="text-xl text-muted-foreground text-pretty">
@@ -105,7 +105,7 @@ export default function HelpPage() {
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
-                  placeholder="Search for help articles, guides, and tutorials..."
+                  placeholder="Search for help..."
                   className="pl-12 h-14 text-lg"
                 />
                 <Button className="absolute right-2 top-2 h-10 hover:bg-black">Search</Button>
@@ -156,7 +156,7 @@ export default function HelpPage() {
       <section className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-balance">Browse by Category</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold text-balance text-foreground">Browse by Category</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-pretty">
               Find the information you need organized by topic.
             </p>
@@ -192,9 +192,6 @@ export default function HelpPage() {
                         </li>
                       ))}
                     </ul>
-                    <Button variant="outline" className="w-full mt-6 bg-transparent">
-                      View All Articles
-                    </Button>
                   </CardContent>
                 </Card>
               )
@@ -207,7 +204,7 @@ export default function HelpPage() {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-balance">Popular Articles</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold text-balance text-foreground">Popular Articles</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-pretty">
               The most helpful articles based on community feedback.
             </p>
@@ -254,7 +251,7 @@ export default function HelpPage() {
                 education experts.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white" asChild>
+                <Button size="lg" variant="secondary" className="text-lg px-8 " asChild>
                   <Link href="/contact">
                     Contact Support
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -263,7 +260,7 @@ export default function HelpPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="text-lg px-8 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent"
+                  className="text-lg px-8 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent hover:text-foreground"
                   asChild
                 >
                   <Link href="/signup">Start Free Trial</Link>

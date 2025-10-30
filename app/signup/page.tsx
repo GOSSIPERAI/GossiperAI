@@ -118,7 +118,7 @@ export default function SignupPage() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
         {/* Logo and Header */}
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-4 text-foreground">
           <Link href="/" className="inline-flex items-center space-x-2 text-2xl font-bold">
             <div className="h-14 w-14 rounded-xl overflow-hidden bg-gradient-to-br from-primary/20 to-primary/10 p-0.5">
               <div className="w-full h-full rounded-lg bg-primary/80 flex items-center justify-center">
