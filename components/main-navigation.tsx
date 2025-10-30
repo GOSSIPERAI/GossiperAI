@@ -84,10 +84,10 @@ export function MainNavigation() {
               </div>
             ) : (
               <>
-                <Button variant="outline" asChild>
+                <Button  className="text-foreground hover:text-foreground" variant="outline" asChild>
                   <Link href="/login">Sign In</Link>
                 </Button>
-                <Button className="hover:bg-black" asChild>
+                <Button asChild>
                   <Link href="/signup">Get Started</Link>
                 </Button>
               </>

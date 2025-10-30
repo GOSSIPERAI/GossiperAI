@@ -19,8 +19,9 @@ const contactMethods = [
     icon: Mail,
     title: "Email Support",
     description: "Get help via email within 24 hours",
-    contact: "support@gossiper.ai",
+    contact: "Gossiperai.sol@gmail.com",
     action: "Send Email",
+    href:'mailto:Gossiperai.sol@gmail.com'
   },
   {
     icon: MessageCircle,
@@ -28,13 +29,15 @@ const contactMethods = [
     description: "Chat with our support team",
     contact: "Available 9 AM - 6 PM WAT",
     action: "Start Chat",
+    href:'#'
   },
   {
     icon: Phone,
     title: "Phone Support",
     description: "Speak directly with our team",
-    contact: "+234 (0) 123 456 7890",
+    contact: "+234 (0) 705 968 8128",
     action: "Call Now",
+    href:'tel:+2347059688128'
   },
 ]
 
@@ -104,7 +107,7 @@ export default function ContactPage() {
             <Badge variant="secondary" className="w-fit mx-auto">
               Get in Touch
             </Badge>
-            <h1 className="text-4xl lg:text-6xl font-bold text-balance">
+            <h1 className="text-4xl lg:text-6xl font-bold text-balance text-foreground">
               We're Here to <span className="text-primary">Help</span>
             </h1>
             <p className="text-xl text-muted-foreground text-pretty">
@@ -132,9 +135,15 @@ export default function ContactPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <p className="font-medium">{method.contact}</p>
-                    <Button variant="outline" className="w-full bg-transparent">
+                    {method.href ?(
+                      <a href={method.href} className="w-full block text-foreground">
+                        <Button variant="outline" className="w-full bg-transparent text-foreground hover:text-foreground">{method.action}</Button>
+                      </a>
+                    ):(
+                    <Button variant="outline" className="w-full bg-transparent text-foreground hover:text-foreground">
                       {method.action}
                     </Button>
+                    )}
                   </CardContent>
                 </Card>
               )
@@ -148,7 +157,7 @@ export default function ContactPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center space-y-4 mb-12">
-              <h2 className="text-3xl lg:text-4xl font-bold text-balance">Send Us a Message</h2>
+              <h2 className="text-3xl lg:text-4xl font-bold text-balance text-blue-700">Send Us a Message</h2>
               <p className="text-xl text-muted-foreground text-pretty">
                 Fill out the form below and we'll get back to you as soon as possible.
               </p>
@@ -242,7 +251,7 @@ export default function ContactPage() {
                         </>
                       )}
                     </Button>
-                    <Button type="button" variant="outline" asChild>
+                    <Button type="button" className="text-foreground hover:text-foreground" variant="outline" asChild>
                       <Link href="/help">Visit Help Center</Link>
                     </Button>
                   </div>
@@ -258,7 +267,7 @@ export default function ContactPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center space-y-4 mb-12">
-              <h2 className="text-3xl lg:text-4xl font-bold text-balance">Our Office</h2>
+              <h2 className="text-3xl lg:text-4xl font-bold text-balance text-foreground">Our Office</h2>
               <p className="text-xl text-muted-foreground text-pretty">Visit us or reach out during business hours.</p>
             </div>
 
@@ -317,7 +326,7 @@ export default function ContactPage() {
       <footer className="border-t border-border bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center text-muted-foreground">
-            <p>&copy; 2024 Gossiper. All rights reserved. We're here to help.</p>
+            <p>&copy; {new Date().getFullYear()} Gossiper. All rights reserved. We're here to help.</p>
           </div>
         </div>
       </footer>
