@@ -2,16 +2,19 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { SecurityHeaders } from '@/lib/auth-security'
 
+export const runtime = 'edge' // ✅ Enable Edge Runtime
+
 export async function middleware(request: NextRequest) {
-  // 🚦 Skip auth for AssemblyAI callbacks
+  // 🚦 Bypass AssemblyAI webhook — must not require auth
   if (request.nextUrl.pathname.startsWith('/api/transcription/callback')) {
-    console.log('🪶 [MIDDLEWARE] Bypassing auth for webhook')
+    console.log('🪶 [MIDDLEWARE] Bypassing auth for AssemblyAI webhook')
     return NextResponse.next()
   }
 
+  // ⚙️ Initialize single NextResponse (Edge-safe)
   const response = NextResponse.next()
 
-  // 🧠 Attach Supabase with proper cookie management
+  // 🧩 Setup Supabase Edge client with cookie handling
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -28,39 +31,39 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  // 🧠 Get current authenticated user (lightweight)
   const { data, error } = await supabase.auth.getUser()
   const user = data?.user ?? null
+  const path = request.nextUrl.pathname
 
-  // 🧩 Define public routes
+  // 🧱 Public routes (no auth required)
   const publicRoutes = [
+    '/',
     '/login',
     '/signup',
     '/forgot-password',
+    '/auth',
     '/auth/callback',
-    '/',
     '/features',
     '/pricing',
     '/about',
     '/help',
     '/contact',
     '/privacy',
-    '/terms'
+    '/terms',
   ]
-
-  // Check if route is public
-  const path = request.nextUrl.pathname
   const isPublic = publicRoutes.some(route => path.startsWith(route))
 
-  // 🔒 Auth Redirect Logic
+  // 🚧 Protect private routes
   if (!user && !isPublic && !path.startsWith('/api')) {
-    console.log(`🛡️ Redirecting unauthenticated request: ${path}`)
+    console.log(`🛡️ Redirect unauthenticated user from: ${path}`)
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('redirect', path)
     return NextResponse.redirect(url)
   }
 
-  // 🚫 Prevent authenticated users from revisiting login/signup
+  // 🚫 Prevent logged-in users from hitting login/signup pages
   if (
     user &&
     request.method === 'GET' &&
@@ -74,27 +77,28 @@ export async function middleware(request: NextRequest) {
         ? '/dashboard?role=admin'
         : '/dashboard?role=student'
 
+    console.log(`🔁 Redirecting ${user.id.slice(0, 6)} to dashboard`)
     return NextResponse.redirect(new URL(redirect, request.url))
   }
 
-  // 👮 Role-based route guard
+  // 👮 Role-based access control
   if (user && path.startsWith('/create-session')) {
     const role = user.user_metadata?.role || 'student'
     if (role !== 'lecturer' && role !== 'admin') {
-      console.log(`🛑 Unauthorized attempt by ${user.id.slice(0, 6)}`)
+      console.warn(`🚫 Unauthorized create-session by ${user.id.slice(0, 6)}`)
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
   }
 
-  // 🧾 Attach user info headers for API routes
+  // 🧾 Attach user context headers for API calls
   if (user && path.startsWith('/api')) {
     response.headers.set('x-user-id', user.id)
     response.headers.set('x-user-role', user.user_metadata?.role || 'student')
   }
 
-  // 🛡️ Add final security headers
-  Object.entries(SecurityHeaders.getSecurityHeaders()).forEach(([k, v]) =>
-    response.headers.set(k, v)
+  // 🛡️ Apply security headers last
+  Object.entries(SecurityHeaders.getSecurityHeaders()).forEach(([key, val]) =>
+    response.headers.set(key, val)
   )
 
   return response
