@@ -14,17 +14,26 @@ const team = [
     image: "/melody.jpg",
   },
   {
-    name: "Sarah Chen",
-    role: "CTO",
-    bio: "AI/ML expert with experience at Google and Microsoft, specializing in real-time speech processing.",
-    image: "/professional-headshot-of-sarah-chen.jpg",
+    name: "Arixe",
+    role: "Backend Developer",
+    bio: 
+    `Professional backend developer, Arixe is a passionate and resiliant developer that not only writes efficient code,
+     but also is soft spoken and communicates greatly`,
+    image: "/Arixe.jpg",
   },
   {
-    name: "Michael Rodriguez",
-    role: "Head of Product",
-    bio: "Former product manager at Zoom, passionate about inclusive design and accessibility.",
-    image: "/professional-headshot-of-michael-rodriguez.jpg",
+    name: "Victory",
+    role: "Business Developer",
+    bio: "Growth-driven Business Developer specializing in lead generation, client acquisition, and long-term relationship management.",
+    image: "/Victory.jpg",
   },
+  {
+    name:'Hikaru',
+    role:"Frontend Developer",
+    bio:
+    `Passionate Frontend Developer turning ideas into sleek, interactive interfaces with clean code and great design.`,
+    image:'/Hikaru.jpg',
+  }
 ]
 
 const stats = [
@@ -46,7 +55,7 @@ export default function AboutPage() {
             <Badge variant="secondary" className="w-fit mx-auto">
               Our Story
             </Badge>
-            <h1 className="text-4xl lg:text-6xl font-bold text-balance">
+            <h1 className="text-4xl lg:text-6xl font-bold text-balance text-foreground">
               Breaking Down <span className="text-primary">Language Barriers</span> in Education
             </h1>
             <p className="text-xl text-muted-foreground text-pretty">
@@ -58,7 +67,7 @@ export default function AboutPage() {
       </section>
 
       {/* Mission Section */}
-      <section className="py-20 bg-muted/30">
+      <section className="py-20 bg-muted/30 text-foreground">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
@@ -132,7 +141,7 @@ export default function AboutPage() {
       <section className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-balance">Meet Our Team</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold text-balance text-foreground">Meet Our Team</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-pretty">
               A diverse group of educators, technologists, and accessibility advocates working together to democratize
               education.
@@ -166,7 +175,7 @@ export default function AboutPage() {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-balance">Our Values</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold text-balance text-foreground">Our Values</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-pretty">
               The principles that guide everything we do.
             </p>
@@ -259,7 +268,7 @@ export default function AboutPage() {
                 working toward universal educational access.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="text-lg px-8 bg-white hover:bg-sidebar-accent-foreground transition-all hover:text-white" asChild>
+                <Button size="lg" variant="secondary" className="text-lg px-8 " asChild>
                   <Link href="/signup">
                     Get Started Today
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -268,7 +277,7 @@ export default function AboutPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="text-lg px-8 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent"
+                  className="text-lg px-8 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent hover:text-foreground"
                   asChild
                 >
                   <Link href="/careers">Join Our Team</Link>
@@ -283,7 +292,7 @@ export default function AboutPage() {
       <footer className="border-t border-border bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center text-muted-foreground">
-            <p>&copy; 2024 Gossiper. All rights reserved. Making education accessible worldwide.</p>
+            <p>&copy; {new Date().getFullYear()} Gossiper. All rights reserved. Making education accessible worldwide.</p>
           </div>
         </div>
       </footer>

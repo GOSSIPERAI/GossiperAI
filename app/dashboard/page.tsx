@@ -270,7 +270,7 @@ export default function DashboardPage() {
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background text-foreground">
         {/* Navigation */}
         <nav className="border-b border-border bg-background/95 backdrop-blur sticky top-0 z-40">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -330,7 +330,7 @@ export default function DashboardPage() {
               </p>
               {!user?.wallet_connected && (
                 <p className="text-amber-600 text-sm mt-1">
-                  💡 Connect your Solana wallet to participate in payment pools
+                  💡 Connect your Base wallet to participate in payment pools
                 </p>
               )}
             </div>
@@ -554,7 +554,7 @@ export default function DashboardPage() {
                   <CardContent className="space-y-4">
                     <div>
                       <label htmlFor="default-language" className="text-sm font-medium">Default Caption Language</label>
-                      <select id="default-language" className="w-full mt-1 p-2 border rounded-md">
+                      <select id="default-language" className="w-full mt-1 p-2 rounded-md">
                         <option value="en">English</option>
                         <option value="yo">Yoruba</option>
                         <option value="fr">French</option>
@@ -563,7 +563,7 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <label htmlFor="translation-language" className="text-sm font-medium">Translation Language</label>
-                      <select id="translation-language" className="w-full mt-1 p-2 border rounded-md">
+                      <select id="translation-language" className="w-full mt-1 p-2 rounded-md">
                         <option value="yo">Yoruba</option>
                         <option value="en">English</option>
                         <option value="fr">French</option>
