@@ -3,8 +3,7 @@
 // Used only in streaming mode (USE_STREAMING=true)
 
 import { NextResponse } from 'next/server';
-
-export const runtime = 'edge'; // Use Edge runtime for better performance
+import { AssemblyAI } from 'assemblyai';
 
 export async function GET() {
   try {
@@ -17,26 +16,15 @@ export async function GET() {
       );
     }
 
-    // Request a temporary token from AssemblyAI Realtime API
-    const res = await fetch('https://api.assemblyai.com/v2/realtime/token', {
-      method: 'POST',
-      headers: {
-        Authorization: ASSEMBLYAI_API_KEY,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ expires_in: 3600 }), // Token expires in 1 hour
+    // Create AssemblyAI client and generate temporary token using SDK
+    const client = new AssemblyAI({ apiKey: ASSEMBLYAI_API_KEY });
+    
+    // expires_in_seconds must be between 1 and 600 seconds
+    const expiresInSeconds = 600; // Token expires in 10 minutes (maximum allowed)
+    
+    const token = await client.streaming.createTemporaryToken({ 
+      expires_in_seconds: expiresInSeconds 
     });
-
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error('[STREAMING] Token generation failed:', res.status, errorText);
-      return NextResponse.json(
-        { error: 'Failed to generate token' },
-        { status: res.status }
-      );
-    }
-
-    const { token } = await res.json();
     
     if (!token) {
       return NextResponse.json(
@@ -45,11 +33,12 @@ export async function GET() {
       );
     }
 
+    console.log('[STREAMING] Token generated successfully');
     return NextResponse.json({ token });
   } catch (error) {
     console.error('[STREAMING] Token generation error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
