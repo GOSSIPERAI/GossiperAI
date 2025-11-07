@@ -54,12 +54,12 @@ export async function POST(req: NextRequest) {
     const confidence = body.confidence || null;
 
     // Calculate text metrics
-    const wordCount = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
+    const wordCount = text ? text.split(/\s+/).filter((w: string) => w.length > 0).length : 0;
     const characterCount = text ? text.length : 0;
 
     // Generate a unique job ID for this streaming transcript chunk
     // Use timestamp + random to ensure uniqueness
-    const assemblyAiJobId = `streaming_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const assemblyAiJobId = `streaming_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
     // Insert into transcription table (same table as pre-recorded flow)
     const { error: insertError } = await supabase
