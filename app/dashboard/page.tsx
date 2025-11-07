@@ -54,6 +54,10 @@ import { Input } from "@/components/ui/input"
 // Proposal: Remove 'profile' from the destructuring assignment.
 // If you need 'profile', ensure it is provided by useAuth() or fetch it separately.
 
+// Feature flag for experimental role-based routing
+// Set this to true to enable the new role-specific dashboards
+const EXPERIMENTAL_ROLE_BASED_ROUTING = false
+
 export default function DashboardPage() {
   const { user, signOut } = useAuth()
   const { connected, publicKey, getBalance } = useSolana()
@@ -61,6 +65,14 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
   const [walletBalance, setWalletBalance] = useState<number | null>(null)
+
+  // Experimental: Role-based routing
+  if (EXPERIMENTAL_ROLE_BASED_ROUTING && user?.role) {
+    // Redirect to role-specific dashboard
+    const dashboardPath = user.role === 'lecturer' ? '/dashboard/lecturer' : '/dashboard/student'
+    redirect(dashboardPath)
+    return null
+  }
 
   useEffect(() => {
     let isMounted = true
@@ -609,3 +621,8 @@ export default function DashboardPage() {
     </AuthGuard>
   )
 }
+function redirect(dashboardPath: string) {
+  // Since we're using Next.js app router, we can use the router for client-side navigation
+  window.location.href = dashboardPath
+}
+

@@ -81,9 +81,9 @@ export function getRoleBasedWelcomeMessage(role: UserRole, userName?: string): s
   
   switch (role) {
     case 'lecturer':
-      return `Welcome back, ${name}! Manage your sessions and track student engagement.`
+      return `Welcome back, ${name}! Manage your sessions and track participant engagements.`
     case 'student':
-      return `Welcome back, ${name}! Continue learning with AI-powered captions and translations.`
+      return `Welcome back, ${name}! Manage your sessions and Continue learning with AI-powered captions and translations.`
     case 'admin':
       return `Welcome back, ${name}! Monitor system performance and manage users.`
     default:
@@ -98,7 +98,7 @@ export function hasPermission(userRole: UserRole | undefined, permission: string
   if (!userRole) return false
   
   const rolePermissions: Record<UserRole, string[]> = {
-    student: ['session:join', 'session:leave', 'caption:view', 'payment:contribute'],
+    student: ['session:create', 'session:edit', 'session:end', 'participant:manage', 'caption:edit', 'session:join', 'session:leave', 'caption:view', 'payment:contribute'],
     lecturer: ['session:create', 'session:edit', 'session:end', 'participant:manage', 'caption:edit', 'session:join', 'session:leave', 'caption:view', 'payment:contribute'],
     admin: ['admin:users', 'admin:sessions', 'admin:analytics', 'admin:settings', 'session:create', 'session:edit', 'session:end', 'participant:manage', 'caption:edit', 'session:join', 'session:leave', 'caption:view', 'payment:contribute']
   }

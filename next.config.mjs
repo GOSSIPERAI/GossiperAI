@@ -43,6 +43,8 @@ const nextConfig = {
     optimizeCss: false,
 
   },*/
+
+  // Add Permissions-Policy header to allow microphone, camera, and geolocation access
   async headers() {
     return [
       {
@@ -50,7 +52,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Permissions-Policy',
-            value: 'microphone=(self), camera=(self), geolocation=(self)'  // ✅ Allow access
+            value: 'microphone=(), camera=(), geolocation=()'  // ✅ Allow access
           }
         ]
       }

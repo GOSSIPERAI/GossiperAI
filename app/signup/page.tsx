@@ -54,7 +54,14 @@ export default function SignupPage() {
         try {
           const result = await signInWithWallet(publicKey.toString())
           if (result.error) {
-            setError(`Wallet authentication failed: ${result.error.message}`)
+            // Safely handle different possible error shapes
+            if (typeof result.error === "object" && result.error !== null && "message" in result.error) {
+              setError(`Wallet authentication failed: ${(result.error as any).message}`)
+            } else if (typeof result.error === "string") {
+              setError(`Wallet authentication failed: ${result.error}`)
+            } else {
+              setError("Wallet authentication failed")
+            }
           } else {
             // Success! Redirect immediately
             const redirect = searchParams.get('redirect') || getDefaultRedirect('student')
@@ -73,6 +80,11 @@ export default function SignupPage() {
 
     handleWalletAuth()
   }, [connected, publicKey, user, signInWithWallet, router, searchParams, isWalletLoading])
+// new function to validate username
+  const isValidUsername = (name: string) => {
+    const usernameRegex = /^[a-zA-Z0-9_-]{3,50}$/;
+    return usernameRegex.test(name);
+  };
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -92,23 +104,50 @@ export default function SignupPage() {
       setIsLoading(false)
       return
     }
+//new function to validate username
+    if (!isValidUsername(name)) {
+      setError("Name must be 3-50 characters long and can only contain letters, numbers, hyphens (-) and underscores (_)");
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      const { error } = await signUp(email, password, { name, role })
-      if (error) {
-        setError(error.message || "Failed to create account. Please try again.")
-      } else {
-        setSuccess("Account created successfully! Please check your email to verify your account.")
-        // Clear form
-        setEmail("")
-        setPassword("")
-        setConfirmPassword("")
-        setName("")
-        // Note: User will need to verify email before they can sign in
-        // No automatic redirect since email verification is required
+      const result = await signUp(email, password, { name, role })
+      
+      // Handle various error cases
+      if (result.error) {
+        // If error is an object with a message property
+        if (typeof result.error === 'object' && result.error !== null && 'message' in result.error) {
+          // result.error may be typed as never; cast to any to safely access message
+          setError((result.error as any).message)
+        } 
+        // If error is a string
+        else if (typeof result.error === 'string') {
+          setError(result.error)
+        }
+        // If error is something else
+        else {
+          setError("Failed to create account. Please check your information and try again.")
+        }
+        return
       }
+
+      // Success case
+      setSuccess("Account created successfully! Please check your email to verify your account.")
+      // Clear form
+      setEmail("")
+      setPassword("")
+      setConfirmPassword("")
+      setName("")
+      // Note: User will need to verify email before they can sign in
+      // No automatic redirect since email verification is required
     } catch (err) {
-      setError("An unexpected error occurred. Please try again.")
+      console.error('Signup error:', err)
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError("An unexpected error occurred. Please try again.")
+      }
     } finally {
       setIsLoading(false)
     }

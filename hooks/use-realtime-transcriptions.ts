@@ -9,6 +9,7 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import { createBrowserClient } from "@supabase/ssr"
 import type { RealtimeChannel } from "@supabase/supabase-js"
 
+
 export interface RealtimeTranscription {
   id: string
   session_id: string

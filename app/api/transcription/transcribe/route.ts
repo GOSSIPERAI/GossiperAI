@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { connectStream } from '@/lib/assembly-ai/assemblyai'
 import { AssemblyAIService, ErrorHandler, Logger, Config } from '../../../../services/transcription/lib/assemblyai'
 import { TranscriptionResponse } from '../../../../services/transcription/lib/types'
 
@@ -233,3 +234,37 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(errorResponse, { status: 500 })
   }
 }
+
+
+// This is for AssemblyAi streaming
+export const useTranscript = () => {
+  const [text, setText] = useState('');
+  const [partials, setPartials] = useState<string[]>([]);
+  const wsRef = useRef<ReturnType<typeof connectStream> | null>(null);
+
+  const start = async () => {
+    const res = await fetch('/api/token');
+    const { token } = await res.json();
+
+    wsRef.current = connectStream(token, (msg) => {
+      if (!msg.isFinal) setPartials((p) => [...p.slice(-4), msg.text]);
+      else {
+        setText((t) => t + ' ' + msg.text);
+        setPartials([]);
+      }
+    });
+  };
+
+  const send = (chunk: ArrayBuffer) => wsRef.current?.send(chunk);
+  const stop = () => wsRef.current?.close();
+
+  return { text, partials, start, send, stop };
+};
+// In useTranscript.ts → start()
+const { token } = await (await fetch('/api/token')).json();
+
+ws = new WebSocket(
+  `wss://streaming.assemblyai.com/v2/realtime/ws?sample_rate=16000` +
+  `&token=${token}` +
+  `&webhook_url=https://your-app.vercel.app/api/ingest`
+);

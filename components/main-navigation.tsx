@@ -10,19 +10,41 @@ import { Menu, X, ArrowRight, Zap, Globe, Users, LogOut, User, Headphones } from
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
+import { USER_FIELDS, USER_ROLES } from "@/lib/constants"
 
-const navigation = [
+ // Not beign used currently
+const homeNavigation = [
   { name: "Features", href: "/features", icon: Zap },
   { name: "Pricing", href: "/pricing", icon: Globe },
   { name: "About", href: "/about", icon: Users },
   { name: "Help", href: "/help", icon: Headphones },
 ]
 
-export function MainNavigation() {
+//Not being used currently
+const dashboardNavigation = [
+  { name: "Dashboard", href: "/dashboard", icon: User },
+  { name: "Sessions", href: "/dashboard/sessions", icon: Users },
+  { name: "Create Session", href: "/create-session", icon: Zap },
+  { name: "Join Session", href: "/join-session", icon: Globe },
+  { name: "Settings", href: "/dashboard/settings", icon: Headphones },
+]
+
+interface NavigationProps {
+  variant?: 'home' | 'dashboard'
+}
+
+export function MainNavigation({ variant = 'home' }: NavigationProps) {
+  const navigation = variant === 'home' ? homeNavigation : dashboardNavigation
+  
+  // Add dashboard-specific styles and classes
+  const containerClasses = cn(
+    "border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50",
+    variant === 'dashboard' && "border-border/50 bg-background"
+  )
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
-  const { user, profile, signOut } = useAuth()
+  const { user, signOut } = useAuth()
 
   const handleLogout = async () => {
     try {
@@ -35,7 +57,7 @@ export function MainNavigation() {
   }
 
   return (
-    <nav className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+    <nav className={containerClasses}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
@@ -72,9 +94,9 @@ export function MainNavigation() {
               <div className="flex items-center space-x-3">
                 <div className="flex items-center space-x-2">
                   <User className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">{profile?.name || user.email}</span>
-                  <Badge variant={profile?.role === "lecturer" ? "default" : "outline"} className="text-xs">
-                    {profile?.role || "user"}
+                  <span className="text-sm text-muted-foreground">{user?.full_name || user?.email}</span>
+                  <Badge variant={user?.role === USER_ROLES.LECTURER ? "default" : "outline"} className="text-xs">
+                    {user?.role || "user"}
                   </Badge>
                 </div>
                 <Button variant="outline" size="sm" onClick={handleLogout}>
@@ -200,9 +222,9 @@ export function MainNavigation() {
                       <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted">
                         <User className="h-5 w-5 text-muted-foreground" />
                         <div className="flex-1">
-                          <p className="font-medium text-foreground">{profile?.name || user.email}</p>
-                          <Badge variant={profile?.role === "lecturer" ? "default" : "outline"} className="text-xs">
-                            {profile?.role || "user"}
+                          <p className="font-medium text-foreground">{user?.full_name || user?.email}</p>
+                          <Badge variant={user?.role === USER_ROLES.LECTURER ? "default" : "outline"} className="text-xs">
+                            {user?.role || "user"}
                           </Badge>
                         </div>
                       </div>
@@ -242,4 +264,12 @@ export function MainNavigation() {
       </div>
     </nav>
   )
+}
+
+export function HomeNavigation() {
+  return <MainNavigation variant="home" />
+}
+
+export function DashboardNavigation() {
+  return <MainNavigation variant="dashboard" />
 }

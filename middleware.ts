@@ -78,13 +78,13 @@ export async function middleware(request: NextRequest) {
   }
 
   // 👮 Role-based route guard
-  if (user && path.startsWith('/create-session')) {
+  /*if (user && path.startsWith('/create-session')) {
     const role = user.user_metadata?.role || 'student'
     if (role !== 'lecturer' && role !== 'admin') {
       console.log(`🛑 Unauthorized attempt by ${user.id.slice(0, 6)}`)
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
-  }
+  }*/
 
   // 🧾 Attach user info headers for API routes
   if (user && path.startsWith('/api')) {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
+import { USER_ROLES, USER_FIELDS } from "@/lib/constants"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
@@ -36,6 +37,8 @@ import { useBase } from "@/hooks/use-base"
 import { getSessionClient, getSessionParticipantsClient, type Session, type SessionParticipant } from "@/lib/session-service-client"
 import { toast } from "sonner"
 import { formatEther } from "ethers"
+import { useStreamingTranscription } from "@/hooks/use-streaming-transcription"
+import { USE_STREAMING } from "@/lib/config"
 
 const AVAILABLE_LANGUAGES = [
   { code: "en", name: "English" },
@@ -90,6 +93,9 @@ export default function SessionPage() {
   const [recordingError, setRecordingError] = useState<string | null>(null)
   const [recordingTimer, setRecordingTimer] = useState<NodeJS.Timeout | null>(null)
   const [recordingTimeRemaining, setRecordingTimeRemaining] = useState<number>(0)
+
+  // Streaming transcription hook (unified for both modes)
+  const streamingTranscription = useStreamingTranscription(sessionId)
 
   // Cleanup recording on unmount
   useEffect(() => {
@@ -282,13 +288,14 @@ export default function SessionPage() {
   }
 
   // Audio recording functions
+  // Supports both streaming and pre-recorded modes based on USE_STREAMING config
   const startRecording = async () => {
     try {
       setRecordingError(null)
       
       // Check if we're on HTTPS or localhost
-      if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-        setRecordingError('Microphone access requires HTTPS. Please use a secure connection.')
+      if (!window.isSecureContext) {
+        setRecordingError('Microphone access is blocked by browser.')
         return
       }
       
@@ -301,49 +308,92 @@ export default function SessionPage() {
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          sampleRate: 44100,
+          sampleRate: USE_STREAMING ? 16000 : 44100, // 16kHz for streaming, 44.1kHz for pre-recorded
         } 
       })
 
-      // Pick a supported mime type for the current browser
-      const preferredTypes = [
-        'audio/webm;codecs=opus',
-        'audio/webm',
-        'audio/mp4',
-        'audio/ogg'
-      ]
-      const supportedType = preferredTypes.find((t) => (window as any).MediaRecorder?.isTypeSupported?.(t)) || ''
-      const recorder = supportedType
-        ? new MediaRecorder(stream, { mimeType: supportedType })
-        : new MediaRecorder(stream)
-      
-      const chunks: Blob[] = []
-      
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunks.push(event.data)
+      // === STREAMING MODE ===
+      if (USE_STREAMING) {
+        // Start streaming transcription
+        await streamingTranscription.startStreaming()
+        
+        // Pick a supported mime type for the current browser
+        const preferredTypes = [
+          'audio/webm;codecs=opus',
+          'audio/webm',
+          'audio/mp4',
+          'audio/ogg'
+        ]
+        const supportedType = preferredTypes.find((t) => (window as any).MediaRecorder?.isTypeSupported?.(t)) || ''
+        const recorder = supportedType
+          ? new MediaRecorder(stream, { mimeType: supportedType })
+          : new MediaRecorder(stream)
+        
+        // Send audio chunks directly to streaming API
+        recorder.ondataavailable = async (event) => {
+          if (event.data.size > 0) {
+            // Convert Blob to ArrayBuffer for streaming
+            const arrayBuffer = await event.data.arrayBuffer()
+            streamingTranscription.sendAudio(arrayBuffer)
+          }
         }
+        
+        recorder.onstop = () => {
+          streamingTranscription.stopStreaming()
+          stream.getTracks().forEach(track => track.stop())
+        }
+        
+        // Start recording with small chunks for low latency (250ms)
+        recorder.start(250)
+        setMediaRecorder(recorder)
+        setIsRecording(true)
+        
+        console.log('[STREAMING] Started streaming transcription')
+      } 
+      // === PRE-RECORDED MODE ===
+      else {
+        // Pick a supported mime type for the current browser
+        const preferredTypes = [
+          'audio/webm;codecs=opus',
+          'audio/webm',
+          'audio/mp4',
+          'audio/ogg'
+        ]
+        const supportedType = preferredTypes.find((t) => (window as any).MediaRecorder?.isTypeSupported?.(t)) || ''
+        const recorder = supportedType
+          ? new MediaRecorder(stream, { mimeType: supportedType })
+          : new MediaRecorder(stream)
+        
+        const chunks: Blob[] = []
+        
+        recorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            chunks.push(event.data)
+          }
+        }
+        
+        recorder.onstop = async () => {
+          const blobType = supportedType || 'audio/webm'
+          const audioBlob = new Blob(chunks, { type: blobType })
+          await sendAudioToTranscription(audioBlob)
+          setAudioChunks([])
+          stream.getTracks().forEach(track => track.stop())
+        }
+        
+        recorder.start(5000) // 5 second chunks for pre-recorded
+        setMediaRecorder(recorder)
+        setIsRecording(true)
+        
+        setRecordingTimeRemaining(60)
+        const timer = setTimeout(() => {
+          stopRecording()
+          setIsMicOn(false)
+          setRecordingTimeRemaining(0)
+        }, 60000)
+        setRecordingTimer(timer)
+        
+        console.log('[PRERECORDED] Started pre-recorded transcription')
       }
-      
-      recorder.onstop = async () => {
-        const blobType = supportedType || 'audio/webm'
-        const audioBlob = new Blob(chunks, { type: blobType })
-        await sendAudioToTranscription(audioBlob)
-        setAudioChunks([])
-        stream.getTracks().forEach(track => track.stop())
-      }
-      
-      recorder.start(5000)
-      setMediaRecorder(recorder)
-      setIsRecording(true)
-      
-      setRecordingTimeRemaining(60)
-      const timer = setTimeout(() => {
-        stopRecording()
-        setIsMicOn(false)
-        setRecordingTimeRemaining(0)
-      }, 60000)
-      setRecordingTimer(timer)
       
     } catch (error) {
       console.error('Error starting recording:', error)
@@ -371,6 +421,11 @@ export default function SessionPage() {
       mediaRecorder.stop()
       setIsRecording(false)
       setMediaRecorder(null)
+    }
+    
+    // Stop streaming if in streaming mode
+    if (USE_STREAMING && streamingTranscription.isActive) {
+      streamingTranscription.stopStreaming()
     }
     
     if (recordingTimer) {
@@ -454,8 +509,8 @@ export default function SessionPage() {
                     <div className="h-2 w-2 rounded-full bg-green-500"></div>
                     <span>Live</span>
                   </Badge>
-                  <Badge variant={user?.role === "lecturer" ? "default" : "outline"} className="text-xs">
-                    {user?.role === "lecturer" ? "Lecturer" : "Student"}
+                  <Badge variant={user?.role === USER_ROLES.LECTURER ? "default" : "outline"} className="text-xs">
+                    {user?.role === USER_ROLES.LECTURER ? "Lecturer" : "Student"}
                   </Badge>
                   {isConnected && (
                     <Badge variant="outline" className="flex items-center space-x-1">
@@ -499,7 +554,7 @@ export default function SessionPage() {
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  {user?.role === "lecturer" && (
+                  {user?.role === USER_ROLES.LECTURER && (
                     <>
                       <Button variant="outline" size="sm" onClick={copyJoinCode}>
                         <Copy className="h-4 w-4 mr-2" />
@@ -525,12 +580,22 @@ export default function SessionPage() {
                     <Languages className="h-4 w-4 text-primary" />
                     <span className="text-sm font-medium">Caption Language:</span>
                   </div>
-                  {user?.role === "lecturer" && isRecording && isMicOn && (
+                    {user?.role === USER_ROLES.LECTURER && isRecording && isMicOn && (
                     <div className="flex items-center space-x-2">
                       <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse"></div>
                       <span className="text-sm text-red-600 font-medium">
-                        Recording...{recordingTimeRemaining > 0 ? ` (${recordingTimeRemaining}s)` : ""}
+                        {USE_STREAMING ? 'Streaming...' : `Recording...${recordingTimeRemaining > 0 ? ` (${recordingTimeRemaining}s)` : ""}`}
                       </span>
+                      {USE_STREAMING && (
+                        <Badge variant="outline" className="text-xs text-green-600">
+                          Live
+                        </Badge>
+                      )}
+                    </div>
+                  )}
+                  {streamingTranscription.error && (
+                    <div className="text-xs text-red-600">
+                      {streamingTranscription.error}
                     </div>
                   )}
                 </div>
@@ -538,7 +603,7 @@ export default function SessionPage() {
                   <Button variant="outline" size="sm" onClick={() => setIsMuted(!isMuted)}>
                     {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
                   </Button>
-                  {user?.role === "lecturer" && (
+                  {user?.role === USER_ROLES.LECTURER && (
                     <Button 
                       variant={isMicOn ? "default" : "outline"} 
                       size="sm" 
@@ -559,7 +624,7 @@ export default function SessionPage() {
             </div>
 
             <div className="flex-1">
-              {user?.role === "lecturer" ? (
+              {user?.role === USER_ROLES.LECTURER ? (
                 <CaptionDisplay
                   sessionId={sessionId}
                   selectedLanguage={selectedLanguage}
@@ -588,7 +653,7 @@ export default function SessionPage() {
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center space-x-2 text-base">
                       <DollarSign className="h-4 w-4 text-primary" />
-                      <span>{user?.role === "lecturer" ? "Class Pool" : "Contribute to Session"}</span>
+                      <span>{user?.role === USER_ROLES.LECTURER ? "Class Pool" : "Contribute to Session"}</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
@@ -620,7 +685,7 @@ export default function SessionPage() {
                       />
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {user?.role === "lecturer" 
+                      {user?.role === USER_ROLES.LECTURER 
                         ? `${sessionData.paymentPool?.contributions || 0} students contributed`
                         : `Help fund this session with ${sessionData.paymentPool?.contributions || 0} other students`
                       }
@@ -633,7 +698,7 @@ export default function SessionPage() {
                       </div>
                     )}
 
-                    {user?.role === "student" && (
+                    {user?.role === USER_ROLES.STUDENT && (
                       <>
                         {!isConnected ? (
                           <Button size="sm" className="w-full" onClick={handleConnectWallet}>
@@ -663,7 +728,7 @@ export default function SessionPage() {
                       </>
                     )}
 
-                    {user?.role === "lecturer" && (
+                    {user?.role === USER_ROLES.LECTURER && (
                       <div className="text-center">
                         <p className="text-xs text-muted-foreground">
                           Share the join code to let students contribute
@@ -686,7 +751,7 @@ export default function SessionPage() {
                       {(sessionData.participants || participants).map((participant: any) => (
                         <div key={participant.id} className="flex items-center justify-between">
                           <span className="text-sm">
-                            {participant.user?.full_name || participant.name || 'Anonymous'}
+                            {participant.user?.[USER_FIELDS.FULL_NAME] || participant.name || USER_FIELDS.DEFAULT_NAME}
                           </span>
                           <Badge variant="secondary" className="text-xs">
                             {(participant.selected_language || participant.language || 'en').toUpperCase()}

@@ -7,6 +7,7 @@ import { RateLimiter } from '@/lib/auth-security'
 import { handleAuthError, handleSupabaseError } from '@/lib/auth-error-handler'
 import type { AuthResult } from '@/lib/auth-utils'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
+import { USER_FIELDS, USER_METADATA_FIELDS, USER_ROLES } from '@/lib/constants'
 
 interface AuthUser {
   id: string
@@ -99,8 +100,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const newProfile = {
           id: supabaseUser.id,
           email: supabaseUser.email,
-          full_name: supabaseUser.user_metadata?.full_name || supabaseUser.email?.split('@')[0] || 'User',
-          role: supabaseUser.user_metadata?.role || 'student',
+          full_name: supabaseUser.user_metadata?.[USER_METADATA_FIELDS.FULL_NAME] || USER_FIELDS.DEFAULT_NAME,
+          role: supabaseUser.user_metadata?.[USER_METADATA_FIELDS.ROLE] || USER_FIELDS.DEFAULT_ROLE,
           wallet_address: null,
           wallet_connected: false,
         }
@@ -114,10 +115,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const userData: AuthUser = {
         id: profile.id,
         email: profile.email,
-        full_name: profile.name || profile.full_name || supabaseUser.user_metadata?.full_name || 'User',
-        role: profile.role,
-        wallet_address: profile.wallet_address,
-        wallet_connected: profile.wallet_connected || false,
+        full_name: profile[USER_FIELDS.DISPLAY_NAME] || profile[USER_FIELDS.FULL_NAME] || supabaseUser.user_metadata?.[USER_METADATA_FIELDS.FULL_NAME] || USER_FIELDS.DEFAULT_NAME,
+        role: profile[USER_FIELDS.ROLE],
+        wallet_address: profile[USER_FIELDS.WALLET_ADDRESS],
+        wallet_connected: profile[USER_FIELDS.WALLET_CONNECTED] || false,
       }
 
       setUser(userData)
@@ -261,9 +262,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const userData: AuthUser = {
           id: existingUser.id,
           email: existingUser.email,
-          full_name: existingUser.name,
-          role: existingUser.role,
-          wallet_address: existingUser.wallet_address,
+          full_name: existingUser[USER_FIELDS.DISPLAY_NAME] || existingUser[USER_FIELDS.FULL_NAME] || USER_FIELDS.DEFAULT_NAME,
+          role: existingUser[USER_FIELDS.ROLE],
+          wallet_address: existingUser[USER_FIELDS.WALLET_ADDRESS],
           wallet_connected: true,
         }
         setUser(userData)
@@ -302,7 +303,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (authError) {
         console.error('🔐 [SUPABASE] Wallet auth signup error:', authError)
-        return { error: new Error(authError.message) }
+        const errorMessage = handleSupabaseError(authError)
+        return { success: false, error: errorMessage }
       }
 
       // The profile will be created automatically by the database trigger
@@ -312,8 +314,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .update({
           wallet_address: walletAddress,
           wallet_connected: true,
-          name: userData.name,
-          role: userData.role,
+          [USER_FIELDS.FULL_NAME]: userData.name,
+          [USER_FIELDS.ROLE]: userData.role,
         })
         .eq('id', authData.user?.id)
 
@@ -323,10 +325,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       console.log('🔐 [SUPABASE] Wallet signup successful')
-      return { error: null }
+      return { success: true, user: authData.user }
     } catch (error) {
       console.error('🔐 [SUPABASE] Wallet signup error:', error)
-      return { error }
+      const errorMessage = handleAuthError(error)
+      return { success: false, error: errorMessage }
     }
   }
 

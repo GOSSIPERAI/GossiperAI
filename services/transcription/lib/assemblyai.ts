@@ -159,3 +159,33 @@ export class HttpClient {
 }
 
 export { Config };
+
+
+//This is for AssemblyAI streaming
+
+export type Partial = { text: string; isFinal: false };
+export type Final = { text: string; isFinal: true };
+
+export const connectStream = (
+  token: string,
+  onMessage: (msg: Partial | Final) => void
+) => {
+  const ws = new WebSocket(
+    `wss://streaming.assemblyai.com/v2/realtime/ws?sample_rate=16000&token=${token}`
+  );
+
+  ws.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+    if (data.message_type === 'PartialTranscript')
+      onMessage({ text: data.text, isFinal: false });
+    if (data.message_type === 'FinalTranscript')
+      onMessage({ text: data.text, isFinal: true });
+  };
+
+  ws.onopen = () => ws.send(JSON.stringify({ terminate_session: false }));
+
+  return {
+    send: (buf: ArrayBuffer) => ws.readyState === WebSocket.OPEN && ws.send(buf),
+    close: () => ws.close(),
+  };
+};

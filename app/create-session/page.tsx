@@ -18,6 +18,7 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { AuthGuard } from "@/components/auth-guard"
 import { createSessionClient, type CreateSessionData } from "@/lib/session-service-client"
+import { USER_ROLES } from "@/lib/constants"
 
 const AVAILABLE_LANGUAGES = [
   { code: "en", name: "English", nativeName: "English" },
@@ -134,7 +135,7 @@ export default function CreateSessionPage() {
   }
 
   return (
-    <AuthGuard allowedRoles={["lecturer", "admin"]}>
+    <AuthGuard allowedRoles={[USER_ROLES.LECTURER, USER_ROLES.ADMIN]}>
       <div className="min-h-screen bg-background">
         {/* Navigation */}
         <nav className="border-b border-border bg-background/95 backdrop-blur">
