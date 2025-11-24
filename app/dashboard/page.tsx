@@ -311,7 +311,7 @@ export default function DashboardPage() {
                   </div>
                 )}
                 <Button variant="outline" size="icon">
-                  <Bell className="h-4 w-4" />
+                  <Bell className="h-4 w-4 hover:text-foreground" />
                 </Button>
                 <Button variant="outline" size="icon">
                   <Settings className="h-4 w-4" />
@@ -332,7 +332,7 @@ export default function DashboardPage() {
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-8 flex-col md:flex-row !gap[30px]">
             <div>
               <h1 className="text-3xl font-bold text-balance">Welcome back, {user?.full_name?.split(" ")[0] || user?.email?.split("@")[0]}</h1>
               <p className="text-muted-foreground mt-1">
@@ -346,7 +346,7 @@ export default function DashboardPage() {
                 </p>
               )}
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 ">
               {isLecturer && (
                 <Link href="/create-session">
                   <Button className="flex items-center space-x-2">
@@ -356,7 +356,7 @@ export default function DashboardPage() {
                 </Link>
               )}
               <Link href="/join-session">
-                <Button variant="outline" className="flex items-center space-x-2 bg-transparent">
+                <Button variant="outline" className="flex items-center space-x-2 bg-transparent hover:text-foreground">
                   <Users className="h-4 w-4" />
                   <span>Join Session</span>
                 </Button>
