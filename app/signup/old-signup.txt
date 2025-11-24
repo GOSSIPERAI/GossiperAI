@@ -1,5 +1,4 @@
-
-"use client"
+/*"use client"
 
 import type React from "react"
 import { useState, useEffect } from "react"
@@ -9,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, EyeOff, Mail, User, GraduationCap, Loader2, CheckCircle } from "lucide-react"
+import { Eye, EyeOff, Mail, User, GraduationCap, Loader2, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -36,25 +35,14 @@ export default function SignupPage() {
   const { user, signUp, signInWithWallet } = useAuth()
   const { publicKey, connected } = useWallet()
 
-  // ✅ FIXED: Only redirect if user is verified OR is a wallet user
+  // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      // Check if email is verified
-      const isEmailVerified = user.email_verified === true
-      
-      // Wallet users don't need email verification
-      const isWalletUser = !!user.wallet_address && user.wallet_connected
-      
-      if (isEmailVerified || isWalletUser) {
-        const redirect = searchParams.get('redirect') || getDefaultRedirect(user.role as any)
-        console.log('✅ User verified, redirecting to:', redirect)
-        router.push(redirect)
-      } else {
-        console.log('⚠️ User email not verified yet')
-        setSuccess("Please check your email to verify your account before signing in.")
-      }
+      const redirect = searchParams.get('redirect') || getDefaultRedirect(user.role as any)
+      router.push(redirect)
     }
   }, [user, router, searchParams])
+
 
   // Handle immediate wallet authentication
   useEffect(() => {
@@ -75,13 +63,14 @@ export default function SignupPage() {
               setError("Wallet authentication failed")
             }
           } else {
-            // Wallet auth doesn't require email verification
+            // Success! Redirect immediately
             const redirect = searchParams.get('redirect') || getDefaultRedirect('student')
-            console.log('✅ Wallet authentication successful, redirecting...')
+            console.log('Wallet authentication successful, redirecting...')
+            // Use replace instead of push for immediate redirect
             router.replace(redirect)
           }
         } catch (error) {
-          console.error('❌ Error with wallet authentication:', error)
+          console.error('Error with wallet authentication:', error)
           setError("Failed to authenticate with wallet")
         } finally {
           setIsWalletLoading(false)
@@ -91,13 +80,11 @@ export default function SignupPage() {
 
     handleWalletAuth()
   }, [connected, publicKey, user, signInWithWallet, router, searchParams, isWalletLoading])
-
-
-// Username validation
+// new function to validate username
   const isValidUsername = (name: string) => {
-    const usernameRegex = /^[a-zA-Z0-9_-]{3,50}$/
-    return usernameRegex.test(name)
-  }
+    const usernameRegex = /^[a-zA-Z0-9_-]{3,50}$/;
+    return usernameRegex.test(name);
+  };
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -117,11 +104,11 @@ export default function SignupPage() {
       setIsLoading(false)
       return
     }
-
+//new function to validate username
     if (!isValidUsername(name)) {
-      setError("Name must be 3-50 characters long and can only contain letters, numbers, hyphens (-) and underscores (_)")
-      setIsLoading(false)
-      return
+      setError("Name must be 3-50 characters long and can only contain letters, numbers, hyphens (-) and underscores (_)");
+      setIsLoading(false);
+      return;
     }
 
     try {
@@ -129,28 +116,33 @@ export default function SignupPage() {
       
       // Handle various error cases
       if (result.error) {
+        // If error is an object with a message property
         if (typeof result.error === 'object' && result.error !== null && 'message' in result.error) {
+          // result.error may be typed as never; cast to any to safely access message
           setError((result.error as any).message)
-        } else if (typeof result.error === 'string') {
+        } 
+        // If error is a string
+        else if (typeof result.error === 'string') {
           setError(result.error)
-        } else {
+        }
+        // If error is something else
+        else {
           setError("Failed to create account. Please check your information and try again.")
         }
         return
       }
 
-      // ✅ SUCCESS: Show verification message
-      setSuccess("✅ Account created successfully! Please check your email to verify your account before signing in.")
-      
+      // Success case
+      setSuccess("Account created successfully! Please check your email to verify your account.")
       // Clear form
       setEmail("")
       setPassword("")
       setConfirmPassword("")
       setName("")
-      
-      // ✅ CORRECT: No automatic redirect - user must verify email first
+      // Note: User will need to verify email before they can sign in
+      // No automatic redirect since email verification is required
     } catch (err) {
-      console.error('❌ Signup error:', err)
+      console.error('Signup error:', err)
       if (err instanceof Error) {
         setError(err.message)
       } else {
@@ -164,7 +156,7 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
-        {/* Logo and Header */}
+        {/* Logo and Header }
         <div className="text-center space-y-4 text-foreground">
           <Link href="/" className="inline-flex items-center space-x-2 text-2xl font-bold">
             <div className="h-14 w-14 rounded-xl overflow-hidden bg-gradient-to-br from-primary/20 to-primary/10 p-0.5">
@@ -201,15 +193,12 @@ export default function SignupPage() {
             )}
 
             {success && (
-              <Alert className="border-green-500/50 bg-green-500/10">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                <AlertDescription className="text-green-700 dark:text-green-400">
-                  {success}
-                </AlertDescription>
+              <Alert>
+                <AlertDescription>{success}</AlertDescription>
               </Alert>
             )}
 
-{/* Wallet Signup */}
+            {// Wallet Signup - Simplified 
             <div className="space-y-3">
               <div className="text-center">
                 <p className="text-sm text-muted-foreground mb-3">Sign up with your Base wallet</p>
@@ -223,9 +212,11 @@ export default function SignupPage() {
                 )}
                 <p className="text-xs text-muted-foreground mt-2">
                   {connected && publicKey ? (
-                    isWalletLoading ?
-                      "Creating your account..." :
+                    isWalletLoading ? (
+                      "Creating your account..."
+                    ) : (
                       `Connected: ${publicKey.toString().slice(0, 8)}...${publicKey.toString().slice(-8)}`
+                    )
                   ) : (
                     "Connect your wallet to create an account instantly"
                   )}
@@ -242,7 +233,7 @@ export default function SignupPage() {
               </div>
             </div>
 
-            {/* Email Signup Form */}
+            {//Email Signup Form }
             <form onSubmit={handleEmailSignup} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
@@ -254,9 +245,6 @@ export default function SignupPage() {
                   onChange={(e) => setName(e.target.value)}
                   required
                 />
-                <p className="text-xs text-muted-foreground">
-                  3-50 characters, letters, numbers, hyphens and underscores only
-                </p>
               </div>
 
               <div className="space-y-2">
@@ -298,7 +286,7 @@ export default function SignupPage() {
                 </Select>
               </div>
 
-<div className="space-y-2">
+              <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
                   <Input
@@ -377,3 +365,4 @@ export default function SignupPage() {
     </div>
   )
 }
+*/

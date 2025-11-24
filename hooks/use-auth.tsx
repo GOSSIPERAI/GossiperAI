@@ -16,6 +16,7 @@ interface AuthUser {
   role: string
   wallet_address?: string | null
   wallet_connected: boolean
+  email_verified?: boolean
 }
 
 interface AuthContextType {
@@ -97,13 +98,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) {
         console.error('🔐 [SUPABASE] Error loading profile:', error)
         // If profile doesn't exist, create a basic one from auth user data
-        const newProfile = {
+        const newProfile: AuthUser = {
           id: supabaseUser.id,
           email: supabaseUser.email,
           full_name: supabaseUser.user_metadata?.[USER_METADATA_FIELDS.FULL_NAME] || USER_FIELDS.DEFAULT_NAME,
           role: supabaseUser.user_metadata?.[USER_METADATA_FIELDS.ROLE] || USER_FIELDS.DEFAULT_ROLE,
           wallet_address: null,
           wallet_connected: false,
+          email_verified: !!supabaseUser.email_confirmed_at,
         }
         console.log('🔐 [SUPABASE] Using fallback profile:', newProfile)
         setUser(newProfile)
@@ -119,6 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         role: profile[USER_FIELDS.ROLE],
         wallet_address: profile[USER_FIELDS.WALLET_ADDRESS],
         wallet_connected: profile[USER_FIELDS.WALLET_CONNECTED] || false,
+        email_verified: !!supabaseUser.email_confirmed_at,
       }
 
       setUser(userData)

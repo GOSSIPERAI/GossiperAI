@@ -5,57 +5,40 @@
 export interface StreamingMessage {
   text: string;
   isFinal: boolean;
+  raw?: any; // Raw transcript data for final messages
 }
 
 export const connectStream = (
   token: string,
-  sessionId: string,
   onMessage: (msg: StreamingMessage) => void
 ) => {
-  // Build webhook URL for streaming transcripts
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
-    (typeof window !== 'undefined' ? window.location.origin : '');
-  const webhookUrl = `${baseUrl}/api/transcription/ingest?sessionId=${sessionId}`;
-
   const ws = new WebSocket(
-    `wss://streaming.assemblyai.com/v2/realtime/ws?sample_rate=16000&token=${token}` +
-    `&webhook_url=${encodeURIComponent(webhookUrl)}`
+    `wss://streaming.assemblyai.com/v3/realtime/ws?sample_rate=16000&token=${token}`
+    // NO webhook_url — v3 pushes over WS only
   );
 
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
-    // Handle both PartialTranscript and FinalTranscript message types
-    if (data.message_type?.includes('Transcript')) {
-      onMessage({
-        text: data.text || '',
-        isFinal: data.message_type === 'FinalTranscript',
-      });
+    if (data.message_type === 'PartialTranscript') {
+      onMessage({ text: data.text, isFinal: false });
+    }
+    if (data.message_type === 'FinalTranscript') {
+      onMessage({ text: data.text, isFinal: true, raw: data });
     }
   };
 
   ws.onopen = () => {
-    // Send configuration to keep session alive
+    console.log('[v3] Connected');
     ws.send(JSON.stringify({ terminate_session: false }));
   };
 
-  ws.onerror = (error) => {
-    console.error('[STREAMING] WebSocket error:', error);
-  };
-
-  ws.onclose = (event) => {
-    console.log('[STREAMING] WebSocket closed:', event.code, event.reason);
-  };
+  ws.onerror = (e) => console.error('[v3] WS error:', e);
+  ws.onclose = (e) => console.log('[v3] WS closed:', e.code, e.reason);
 
   return {
-    send: (buf: ArrayBuffer) => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.send(buf);
-      }
-    },
-    close: () => {
-      ws.close();
-    },
-    readyState: () => ws.readyState,
+    send: (buf: ArrayBuffer) => ws.readyState === WebSocket.OPEN && ws.send(buf),
+    close: () => ws.close(),
+    isReady: () => ws.readyState === WebSocket.OPEN,
   };
 };
 

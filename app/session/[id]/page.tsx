@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { USER_ROLES, USER_FIELDS } from "@/lib/constants"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -93,6 +93,12 @@ export default function SessionPage() {
   const [recordingError, setRecordingError] = useState<string | null>(null)
   const [recordingTimer, setRecordingTimer] = useState<NodeJS.Timeout | null>(null)
   const [recordingTimeRemaining, setRecordingTimeRemaining] = useState<number>(0)
+  
+  // Audio context refs for streaming mode (Web Audio API)
+  const audioContextRef = useRef<AudioContext | null>(null)
+  const processorRef = useRef<ScriptProcessorNode | null>(null)
+  const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null)
+  const audioStreamRef = useRef<MediaStream | null>(null)
 
   // Streaming transcription hook (unified for both modes)
   const streamingTranscription = useStreamingTranscription(sessionId)
@@ -305,50 +311,52 @@ export default function SessionPage() {
       }
       
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          sampleRate: USE_STREAMING ? 16000 : 44100, // 16kHz for streaming, 44.1kHz for pre-recorded
+        audio: { 
+          sampleRate: 16000,        // Force 16kHz at source
+          channelCount: 1,          // Mono
+          echoCancellation: true
         } 
-      })
+      });
 
       // === STREAMING MODE ===
       if (USE_STREAMING) {
         // Start streaming transcription
         await streamingTranscription.startStreaming()
         
-        // Pick a supported mime type for the current browser
-        const preferredTypes = [
-          'audio/webm;codecs=opus',
-          'audio/webm',
-          'audio/mp4',
-          'audio/ogg'
-        ]
-        const supportedType = preferredTypes.find((t) => (window as any).MediaRecorder?.isTypeSupported?.(t)) || ''
-        const recorder = supportedType
-          ? new MediaRecorder(stream, { mimeType: supportedType })
-          : new MediaRecorder(stream)
-        
-        // Send audio chunks directly to streaming API
-        recorder.ondataavailable = async (event) => {
-          if (event.data.size > 0) {
-            // Convert Blob to ArrayBuffer for streaming
-            const arrayBuffer = await event.data.arrayBuffer()
-            streamingTranscription.sendAudio(arrayBuffer)
+        const audioContext = new AudioContext(); // Auto 48kHz or 44.1kHz
+        const source = audioContext.createMediaStreamSource(stream);
+
+        // Resample to 16kHz
+        const resampler = audioContext.createScriptProcessor(4096, 1, 1);
+        resampler.onaudioprocess = (e) => {
+          const input = e.inputBuffer.getChannelData(0);
+          const output = new Int16Array(Math.floor(input.length * 16000 / audioContext.sampleRate));
+          
+          const ratio = audioContext.sampleRate / 16000;
+          for (let i = 0; i < output.length; i++) {
+            const srcIdx = Math.floor(i * ratio);
+            output[i] = Math.max(-1, Math.min(1, input[srcIdx])) * 0x7FFF;
           }
-        }
+          sendAudio(output.buffer);
+        };
         
-        recorder.onstop = () => {
-          streamingTranscription.stopStreaming()
-          stream.getTracks().forEach(track => track.stop())
-        }
+        source.connect(resampler);
+        resampler.connect(audioContext.destination);
+
+        // Store refs for cleanup
+        audioContextRef.current = audioContext;
+        processorRef.current = resampler;
+        sourceRef.current = source;
         
-        // Start recording with small chunks for low latency (250ms)
-        recorder.start(250)
-        setMediaRecorder(recorder)
+        // Store a mock MediaRecorder for compatibility with stopRecording()
+        setMediaRecorder({
+          stop: () => {
+            // Cleanup will be handled in stopRecording()
+          }
+        } as any)
+        
         setIsRecording(true)
-        
-        console.log('[STREAMING] Started streaming transcription')
+        console.log('[STREAMING] Started streaming transcription with PCM audio')
       } 
       // === PRE-RECORDED MODE ===
       else {
@@ -417,15 +425,39 @@ export default function SessionPage() {
   }
 
   const stopRecording = () => {
-    if (mediaRecorder && isRecording) {
-      mediaRecorder.stop()
+    if (isRecording) {
       setIsRecording(false)
-      setMediaRecorder(null)
     }
     
     // Stop streaming if in streaming mode
-    if (USE_STREAMING && streamingTranscription.isActive) {
-      streamingTranscription.stopStreaming()
+    if (USE_STREAMING) {
+      // Cleanup Web Audio API resources
+      if (processorRef.current) {
+        processorRef.current.disconnect();
+        processorRef.current = null;
+      }
+      if (sourceRef.current) {
+        sourceRef.current.disconnect();
+        sourceRef.current = null;
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close().catch(console.error);
+        audioContextRef.current = null;
+      }
+      
+      if (streamingTranscription.isActive) {
+        streamingTranscription.stopStreaming()
+      }
+      
+      // Stop all stream tracks
+      if (audioStreamRef.current) {
+        audioStreamRef.current.getTracks().forEach(track => track.stop())
+        audioStreamRef.current = null
+      }
+    } else if (mediaRecorder && isRecording) {
+      // Pre-recorded mode cleanup
+      mediaRecorder.stop()
+      setMediaRecorder(null)
     }
     
     if (recordingTimer) {

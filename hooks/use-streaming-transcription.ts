@@ -64,9 +64,26 @@ export function useStreamingTranscription(sessionId: string): StreamingTranscrip
       // Connect to AssemblyAI Realtime WebSocket
       wsRef.current = connectStream(token, sessionId, (msg) => {
         if (msg.isFinal) {
-          // Final transcript - append to full text
+          // Final transcript - append to full text and save to database
           setText((prev) => (prev ? prev + ' ' + msg.text : msg.text));
           setPartial('');
+
+          // Send final transcript to database via ingest API
+          if (msg.raw) {
+            fetch('/api/transcription/ingest', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                session_id: sessionId,
+                text: msg.text,
+                is_final: true,
+                words: msg.raw.words,
+                confidence: msg.raw.confidence
+              })
+            }).catch(err => console.error('[INGEST] Failed:', err));
+          }
+
+          
         } else {
           // Partial transcript - show as temporary text
           setPartial(msg.text);
@@ -86,7 +103,12 @@ export function useStreamingTranscription(sessionId: string): StreamingTranscrip
     if (!USE_STREAMING || !wsRef.current) {
       return;
     }
-    wsRef.current.send(buf);
+    // Only send if WebSocket is ready
+    if (wsRef.current.isReady && wsRef.current.isReady()) {
+      wsRef.current.send(buf);
+    } else {
+      console.warn('[STREAMING] WebSocket not ready, skipping audio chunk');
+    }
   }, []);
 
   const stopStreaming = useCallback(() => {
