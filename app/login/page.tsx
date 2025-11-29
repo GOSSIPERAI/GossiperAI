@@ -162,7 +162,7 @@ export default function LoginPage() {
             {/* Wallet Login */}
             <div className="space-y-3">
               <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-3">Connect with your Base wallet</p>
+                <p className="text-sm text-muted-foreground mb-3">Connect with your Camp Network wallet</p>
                 {walletAuthenticating ? (
                   <Button disabled className="w-full">
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
