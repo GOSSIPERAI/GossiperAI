@@ -147,7 +147,7 @@ export default function DashboardPage() {
   })
 
   useEffect(() => {
-    // Mock dashboard data based on user role
+    // Mock dashboard data Camp Networkd on user role
     if (!user?.role) return
     
     // Use setTimeout to make this non-blocking
@@ -188,7 +188,7 @@ export default function DashboardPage() {
           createMockSession(
             "3", 
             "Chemistry - Organic Compounds", 
-            "Study of carbon-based compounds and their reactions",
+            "Study of carbon-Camp Networkd compounds and their reactions",
             "Dr. Emily Rodriguez", 
             "lecturer3", 
             "ended", 
@@ -330,7 +330,7 @@ export default function DashboardPage() {
               </p>
               {!user?.wallet_connected && (
                 <p className="text-amber-600 text-sm mt-1">
-                  💡 Connect your Base wallet to participate in payment pools
+                  💡 Connect your Camp Network wallet to participate in payment pools
                 </p>
               )}
             </div>

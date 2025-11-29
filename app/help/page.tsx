@@ -13,7 +13,7 @@ const categories = [
     icon: BookOpen,
     articles: [
       "How to join your first session",
-      "Setting up your Base wallet",
+      "Setting up your Camp Network wallet",
       "Choosing your preferred language",
       "Understanding class pools",
     ],
@@ -60,7 +60,7 @@ const popularArticles = [
     readTime: "2 min read",
   },
   {
-    title: "Setting up your Base wallet for payments",
+    title: "Setting up your Camp Network wallet for payments",
     category: "Payments",
     readTime: "5 min read",
   },
@@ -206,7 +206,7 @@ export default function HelpPage() {
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-balance text-foreground">Popular Articles</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-pretty">
-              The most helpful articles based on community feedback.
+              The most helpful articles Camp Networkd on community feedback.
             </p>
           </div>
 
