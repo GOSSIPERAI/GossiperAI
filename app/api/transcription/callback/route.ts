@@ -3,11 +3,8 @@ import { createServiceRoleSupabaseClient } from "@/lib/supabase-server";
 import { TranscriptionValidator } from "@/lib/validation/transcription-validation";
 import { z } from "zod";
 
-// Validate required environment variables
+// Retrieve environment variable (validation happens inside functions to avoid build-time errors)
 const ASSEMBLYAI_API_KEY = process.env.ASSEMBLYAI_API_KEY;
-if (!ASSEMBLYAI_API_KEY) {
-  throw new Error("ASSEMBLYAI_API_KEY environment variable is not set");
-}
 
 interface AssemblyAIResponse {
   id: string;
@@ -35,11 +32,11 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 // Fetch transcript with retry logic
 async function fetchTranscript(jobId: string, maxRetries = 3): Promise<AssemblyAIResponse> {
   let lastError: Error | null = null;
-  
+
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       console.log(`🔄 [Attempt ${attempt}] Fetching transcript ${jobId}`);
-      
+
       // Ensure API key is defined
       if (!ASSEMBLYAI_API_KEY) {
         throw new Error("AssemblyAI API key is not defined");
@@ -57,7 +54,7 @@ async function fetchTranscript(jobId: string, maxRetries = 3): Promise<AssemblyA
       }
 
       const data = await response.json() as AssemblyAIResponse;
-      
+
       if (data.status === "error") {
         throw new Error(data.error || "Unknown AssemblyAI error");
       }
@@ -71,14 +68,14 @@ async function fetchTranscript(jobId: string, maxRetries = 3): Promise<AssemblyA
       }
     }
   }
-  
+
   throw lastError;
 }
 
 // UUID validation helper
 function isValidUUID(uuid: string) {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    return uuidRegex.test(uuid);
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
 }
 
 export async function POST(req: NextRequest) {
@@ -115,9 +112,9 @@ export async function POST(req: NextRequest) {
     }
 
     const webhookData = webhookValidation.data;
-    console.log("✅ Received webhook:", { 
+    console.log("✅ Received webhook:", {
       transcript_id: webhookData.transcript_id,
-      status: webhookData.status 
+      status: webhookData.status
     });
 
     // Fetch full transcript if status is completed
@@ -168,8 +165,8 @@ export async function POST(req: NextRequest) {
       const timestamp = new Date().toISOString();
       const { data: newSession, error: createErr } = await supabase
         .from("sessions")
-        .insert({ 
-          id: sessionId, 
+        .insert({
+          id: sessionId,
           created_at: timestamp,
           updated_at: timestamp,
           status: 'active'  // Add default status if your sessions table has this
@@ -281,7 +278,7 @@ export async function POST(req: NextRequest) {
         audio_url: validatedPayload.audio_url ?? null,
         webhook_status_code: validatedPayload.webhook_status_code ?? null,
       },
-      { 
+      {
         onConflict: "assembly_ai_job_id",
         ignoreDuplicates: false // Force update on conflict
       }
@@ -301,7 +298,7 @@ export async function POST(req: NextRequest) {
     }
 
     console.log("✅ Transcription inserted successfully:", validatedPayload.id);
-    
+
     // Detailed debug logging for Vercel
     console.log("📝 [DEBUG] Callback payload:", {
       sessionId,

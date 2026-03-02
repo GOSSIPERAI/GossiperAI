@@ -1,43 +1,26 @@
-import { NextResponse, type NextRequest } from 'next/server'
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { SecurityHeaders } from '@/lib/auth-security'
+import { NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
+import { NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-  // 🚦 Skip auth for AssemblyAI callbacks
+  // 🚦 Skip auth for AssemblyAI callbacks or other webhooks if needed
   if (request.nextUrl.pathname.startsWith('/api/transcription/callback')) {
-    console.log('🪶 [MIDDLEWARE] Bypassing auth for webhook')
-    return NextResponse.next()
+    return NextResponse.next();
   }
 
-  const response = NextResponse.next()
-
-  // 🧠 Attach Supabase with proper cookie management
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get: (name: string) => request.cookies.get(name)?.value,
-        set: (name: string, value: string, options: CookieOptions) => {
-          response.cookies.set({ name, value, ...options })
-        },
-        remove: (name: string, options: CookieOptions) => {
-          response.cookies.set({ name, value: '', ...options })
-        },
-      },
-    }
-  )
-
-  const { data, error } = await supabase.auth.getUser()
-  const user = data?.user ?? null
+  const token = await getToken({ req: request });
+  const isAuth = !!token;
+  const path = request.nextUrl.pathname;
 
   // 🧩 Define public routes
   const publicRoutes = [
     '/login',
     '/signup',
     '/forgot-password',
-    '/auth/callback',
+    '/auth/error',
     '/',
+    '/api/register',
+    '/api/auth', // Important for NextAuth routes
     '/features',
     '/pricing',
     '/about',
@@ -45,63 +28,57 @@ export async function middleware(request: NextRequest) {
     '/contact',
     '/privacy',
     '/terms'
-  ]
+  ];
 
   // Check if route is public
-  const path = request.nextUrl.pathname
-  const isPublic = publicRoutes.some(route => path.startsWith(route))
+  const isPublic = publicRoutes.some(route => path.startsWith(route));
 
   // 🔒 Auth Redirect Logic
-  if (!user && !isPublic && !path.startsWith('/api')) {
-    console.log(`🛡️ Redirecting unauthenticated request: ${path}`)
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    url.searchParams.set('redirect', path)
-    return NextResponse.redirect(url)
+  if (!isAuth && !isPublic) {
+    console.log(`🛡️ Redirecting unauthenticated request: ${path}`);
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    url.searchParams.set('redirect', path);
+    return NextResponse.redirect(url);
   }
 
   // 🚫 Prevent authenticated users from revisiting login/signup
   if (
-    user &&
-    request.method === 'GET' &&
+    isAuth &&
     (path.startsWith('/login') || path.startsWith('/signup'))
   ) {
-    const role = (user.user_metadata?.role as 'student' | 'lecturer' | 'admin') || 'student'
-    const redirect =
-      role === 'lecturer'
-        ? '/dashboard?role=lecturer'
-        : role === 'admin'
-        ? '/dashboard?role=admin'
-        : '/dashboard?role=student'
+    const role = (token?.role as string) || 'student';
+    // Simple redirection based on role, matching previous logic
+    const redirect = role === 'student' ? '/dashboard' : '/dashboard'; // Simplify to dashboard for now as query params might not be needed
 
-    return NextResponse.redirect(new URL(redirect, request.url))
+    // If strict role logic was needed:
+    // const redirect = role === 'lecturer' ? '/dashboard?role=lecturer' ...
+
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   // 👮 Role-based route guard
-  if (user && path.startsWith('/create-session')) {
-    const role = user.user_metadata?.role || 'student'
+  if (isAuth && path.startsWith('/create-session')) {
+    const role = (token?.role as string) || 'student';
     if (role !== 'lecturer' && role !== 'admin') {
-      console.log(`🛑 Unauthorized attempt by ${user.id.slice(0, 6)}`)
-      return NextResponse.redirect(new URL('/dashboard', request.url))
+      console.log(`🛑 Unauthorized attempt by ${token?.email}`);
+      return NextResponse.redirect(new URL('/dashboard', request.url));
     }
   }
 
-  // 🧾 Attach user info headers for API routes
-  if (user && path.startsWith('/api')) {
-    response.headers.set('x-user-id', user.id)
-    response.headers.set('x-user-role', user.user_metadata?.role || 'student')
+  // 🧾 Attach user info headers for API routes (optional, mainly for legacy compatibility)
+  if (isAuth && path.startsWith('/api')) {
+    const response = NextResponse.next();
+    response.headers.set('x-user-id', token.id as string);
+    response.headers.set('x-user-role', (token.role as string) || 'student');
+    return response;
   }
 
-  // 🛡️ Add final security headers
-  Object.entries(SecurityHeaders.getSecurityHeaders()).forEach(([k, v]) =>
-    response.headers.set(k, v)
-  )
-
-  return response
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
-}
+};

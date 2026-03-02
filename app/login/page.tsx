@@ -46,25 +46,25 @@ export default function LoginPage() {
       if (connected && publicKey && !user && !walletAuthenticating) {
         setWalletAuthenticating(true)
         setError("")
-        
+
         // Set a timeout to prevent infinite loading
         const timeout = setTimeout(() => {
           setWalletAuthenticating(false)
           setError("Wallet authentication timed out. Please try again.")
         }, 10000) // 10 second timeout
-        
+
         setWalletAuthTimeout(timeout)
-        
+
         try {
           console.log('Attempting wallet authentication with:', publicKey.toString())
           // Try to authenticate with wallet (this will create account if needed)
           const result = await signInWithWallet(publicKey.toString())
           console.log('Wallet authentication result:', result)
-          
+
           // Clear timeout on success or error
           if (timeout) clearTimeout(timeout)
           setWalletAuthTimeout(null)
-          
+
           if (!result.error) {
             console.log('Wallet authentication successful, redirecting...')
             const redirect = searchParams.get('redirect') || getDefaultRedirect(result.user?.role as any || 'student')
@@ -76,7 +76,7 @@ export default function LoginPage() {
             }, 100)
           } else {
             console.error('Wallet authentication error:', result.error)
-            setError(`Wallet authentication failed: ${result.error.message}`)
+            setError(`Wallet authentication failed: ${typeof result.error === 'string' ? result.error : (result.error as any).message}`)
             setWalletAuthenticating(false)
           }
         } catch (error) {
@@ -109,7 +109,7 @@ export default function LoginPage() {
     try {
       const { error } = await signIn(email, password)
       if (error) {
-        setError(error.message || "Invalid credentials. Please try again.")
+        setError(typeof error === 'string' ? error : (error as any).message || "Invalid credentials. Please try again.")
       } else {
         // Auth state change and redirect are handled by the AuthProvider's user effect
       }
@@ -172,26 +172,26 @@ export default function LoginPage() {
                   <WalletMultiButtonWrapper className="!w-full !bg-primary hover:!bg-primary/90 !text-primary-foreground !text-sm !py-3 !px-4 !rounded-lg !font-medium" />
                 )}
                 {connected && publicKey && !walletAuthenticating && (
-                  <Button 
+                  <Button
                     onClick={async () => {
                       setWalletAuthenticating(true)
                       setError("")
-                      
+
                       // Set a timeout to prevent infinite loading
                       const timeout = setTimeout(() => {
                         setWalletAuthenticating(false)
                         setError("Wallet authentication timed out. Please try again.")
                       }, 10000) // 10 second timeout
-                      
+
                       setWalletAuthTimeout(timeout)
-                      
+
                       try {
                         const result = await signInWithWallet(publicKey.toString())
-                        
+
                         // Clear timeout on success or error
                         if (timeout) clearTimeout(timeout)
                         setWalletAuthTimeout(null)
-                        
+
                         if (!result.error) {
                           const redirect = searchParams.get('redirect') || getDefaultRedirect(result.user?.role as any || 'student')
                           setWalletAuthenticating(false)
@@ -199,7 +199,7 @@ export default function LoginPage() {
                             router.replace(redirect)
                           }, 100)
                         } else {
-                          setError(`Wallet authentication failed: ${result.error.message}`)
+                          setError(`Wallet authentication failed: ${typeof result.error === 'string' ? result.error : (result.error as any).message}`)
                           setWalletAuthenticating(false)
                         }
                       } catch (error) {

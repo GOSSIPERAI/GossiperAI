@@ -9,6 +9,7 @@ import { AccessibilityProvider } from "@/components/accessibility-provider"
 import { SkipNavigation } from "@/components/skip-navigation"
 import { AccessibilityToolbar } from "@/components/accessibility-toolbar"
 import { AuthProvider } from "@/hooks/use-auth"
+import { ThemeProvider } from "@/components/theme-provider"
 
 const nohemi = Inter({
   subsets: ["latin"],
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
     "Enhance classroom accessibility with AI-powered real-time captioning and translation. Supporting deaf, hard-of-hearing, and international students.",
   generator: "v0.app",
   keywords: ["AI captions", "real-time translation", "accessibility", "education", "Solana Pay"],
-  icons:"/gossiper-logo-white.png",
+  icons: "/gossiper-logo-white.png",
 }
 
 export default function RootLayout({
@@ -32,28 +33,35 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`font-sans ${nohemi.variable} antialiased`}>
-        <AccessibilityProvider>
-          <AuthProvider>
-            <SolanaWalletProvider>
-              <SkipNavigation />
-              <div id="live-region-polite" className="live-region polite" aria-live="polite" aria-atomic="true"></div>
-              <div
-                id="live-region-assertive"
-                className="live-region assertive"
-                aria-live="assertive"
-                aria-atomic="true"
-              ></div>
-              <Suspense fallback={
-                <div className="min-h-screen bg-background flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
-              }>{children}</Suspense>
-              <AccessibilityToolbar />
-            </SolanaWalletProvider>
-          </AuthProvider>
-        </AccessibilityProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          <AccessibilityProvider>
+            <AuthProvider>
+              <SolanaWalletProvider>
+                <SkipNavigation />
+                <div id="live-region-polite" className="live-region polite" aria-live="polite" aria-atomic="true"></div>
+                <div
+                  id="live-region-assertive"
+                  className="live-region assertive"
+                  aria-live="assertive"
+                  aria-atomic="true"
+                ></div>
+                <Suspense fallback={
+                  <div className="min-h-screen bg-background flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                }>{children}</Suspense>
+                <AccessibilityToolbar />
+              </SolanaWalletProvider>
+            </AuthProvider>
+          </AccessibilityProvider>
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>

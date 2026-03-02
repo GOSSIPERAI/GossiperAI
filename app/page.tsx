@@ -50,7 +50,7 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="relative">
               <div className="relative bg-card border border-border rounded-2xl p-6 shadow-2xl">
                 <div className="space-y-4">
@@ -201,7 +201,7 @@ export default function HomePage() {
           <div className="text-center md:text-left mb-8 md:mb-0">
             <div className="flex items-center justify-center md:justify-start space-x-3 mb-4">
               <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl overflow-hidden bg-gradient-to-br from-primary/20 to-primary/10 p-0.5">
-                <div className="w-full h-full rounded-lg bg-primary/80 flex items-center justify-center">
+                <div className="w-full h-full rounded-md bg-primary/80 flex items-center justify-center">
                   <Image
                     src="/gossiper-logo-white.png"
                     alt="Gossiper Logo"

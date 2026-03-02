@@ -27,7 +27,7 @@ const nextConfig = {
 export default nextConfig  */
 
 
-/** @type {import('next').NextConfig} */ 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
@@ -39,23 +39,11 @@ const nextConfig = {
     unoptimized: true,
   },
   //lightning css optimization is causing issues with some styles, disabling for now
- /* experimental: {
-    optimizeCss: false,
+  /* experimental: {
+     optimizeCss: false,
+ 
+   },*/
 
-  },*/
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'Permissions-Policy',
-            value: 'microphone=(self), camera=(self), geolocation=(self)'  // ✅ Allow access
-          }
-        ]
-      }
-    ]
-  }
 }
 
 export default nextConfig

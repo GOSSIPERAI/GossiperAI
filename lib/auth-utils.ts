@@ -78,7 +78,7 @@ export function getRoleBasedTitle(role: UserRole): string {
  */
 export function getRoleBasedWelcomeMessage(role: UserRole, userName?: string): string {
   const name = userName?.split(' ')[0] || 'User'
-  
+
   switch (role) {
     case 'lecturer':
       return `Welcome back, ${name}! Manage your sessions and track student engagement.`
@@ -96,13 +96,13 @@ export function getRoleBasedWelcomeMessage(role: UserRole, userName?: string): s
  */
 export function hasPermission(userRole: UserRole | undefined, permission: string): boolean {
   if (!userRole) return false
-  
+
   const rolePermissions: Record<UserRole, string[]> = {
     student: ['session:join', 'session:leave', 'caption:view', 'payment:contribute'],
     lecturer: ['session:create', 'session:edit', 'session:end', 'participant:manage', 'caption:edit', 'session:join', 'session:leave', 'caption:view', 'payment:contribute'],
     admin: ['admin:users', 'admin:sessions', 'admin:analytics', 'admin:settings', 'session:create', 'session:edit', 'session:end', 'participant:manage', 'caption:edit', 'session:join', 'session:leave', 'caption:view', 'payment:contribute']
   }
-  
+
   return rolePermissions[userRole]?.includes(permission) || false
 }
 
@@ -125,7 +125,7 @@ export function getAuthErrorMessage(error: string): string {
     'Network error': 'Network error occurred. Please check your connection and try again.',
     'Server error': 'An unexpected error occurred. Please try again later.'
   }
-  
+
   return errorMessages[error] || 'An unexpected error occurred. Please try again.'
 }
 
@@ -136,11 +136,11 @@ export function validateSession(session: any): { valid: boolean; user?: User; er
   if (!session) {
     return { valid: false, error: 'No session found' }
   }
-  
+
   if (!session.user) {
     return { valid: false, error: 'Invalid session' }
   }
-  
+
   const user: User = {
     id: session.user.id,
     email: session.user.email,
@@ -156,6 +156,6 @@ export function validateSession(session: any): { valid: boolean; user?: User; er
     preferred_language: session.user.user_metadata?.preferred_language || 'en',
     accessibility_settings: session.user.user_metadata?.accessibility_settings
   }
-  
+
   return { valid: true, user }
 }

@@ -36,7 +36,7 @@ export class AssemblyAIService {
     languageCode?: string
   ): Promise<{ id: string }> {
     const client = this.getClient();
-    
+
     const config: any = {
       audio_url: audioUrl,
       webhook_url: callbackUrl,
@@ -52,28 +52,34 @@ export class AssemblyAIService {
       languageCode,
       fullConfig: config
     });
-    
+
     const transcript = await client.transcripts.create(config);
-    
-    console.log('🎤 [ASSEMBLYAI] Transcription job submitted successfully:', { 
+
+    console.log('🎤 [ASSEMBLYAI] Transcription job submitted successfully:', {
       jobId: transcript.id,
       status: transcript.status,
       webhookUrl: transcript.webhook_url
     });
-    
+
     return { id: transcript.id };
   }
 
   static async uploadFile(fileBuffer: Buffer, fileName: string): Promise<string> {
     const client = this.getClient();
-    
+
     Logger.info('Uploading file to AssemblyAI', { fileName, size: fileBuffer.length });
-    
+
     const uploadUrl = await client.files.upload(fileBuffer);
-    
+
     Logger.info('File uploaded successfully', { uploadUrl });
-    
+
     return uploadUrl;
+  }
+
+  static async createTemporaryToken(expiresIn: number = 3600): Promise<string> {
+    const client = this.getClient();
+    const token = await client.realtime.createTemporaryToken({ expires_in: expiresIn });
+    return token;
   }
 }
 
@@ -99,15 +105,15 @@ export class ErrorHandler {
     if (error.name === 'ValidationError') {
       return this.createErrorResponse('Invalid request data', error);
     }
-    
+
     if (error.status >= 400 && error.status < 500) {
       return this.createErrorResponse('Client error', error);
     }
-    
+
     if (error.status >= 500) {
       return this.createErrorResponse('Server error', error);
     }
-    
+
     return this.createErrorResponse('Unknown error', error);
   }
 }
@@ -115,12 +121,12 @@ export class ErrorHandler {
 export class HttpClient {
   static async forwardToCallback(callbackUrl: string, payload: any): Promise<boolean> {
     try {
-      console.log('📤 [FORWARD] Forwarding result to callback URL:', { 
+      console.log('📤 [FORWARD] Forwarding result to callback URL:', {
         callbackUrl,
         payloadSize: JSON.stringify(payload).length,
         payloadKeys: Object.keys(payload)
       });
-      
+
       const response = await fetch(callbackUrl, {
         method: 'POST',
         headers: {
@@ -137,15 +143,15 @@ export class HttpClient {
 
       if (response.ok) {
         const responseText = await response.text();
-        console.log('📤 [FORWARD] Successfully forwarded to callback URL:', { 
+        console.log('📤 [FORWARD] Successfully forwarded to callback URL:', {
           status: response.status,
           responseText: responseText.substring(0, 200) + (responseText.length > 200 ? '...' : '')
         });
         return true;
       } else {
         const errorText = await response.text();
-        console.warn('📤 [FORWARD] Callback URL responded with non-200 status:', { 
-          status: response.status, 
+        console.warn('📤 [FORWARD] Callback URL responded with non-200 status:', {
+          status: response.status,
           statusText: response.statusText,
           errorText: errorText.substring(0, 200) + (errorText.length > 200 ? '...' : '')
         });

@@ -22,7 +22,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [name, setName] = useState("")
-  const [role, setRole] = useState<"student" | "lecturer">("student")
+  // Role defaults to 'user' for everyone now
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -50,11 +50,11 @@ export default function SignupPage() {
       if (connected && publicKey && !user && !isWalletLoading) {
         setIsWalletLoading(true)
         setError("")
-        
+
         try {
           const result = await signInWithWallet(publicKey.toString())
           if (result.error) {
-            setError(`Wallet authentication failed: ${result.error.message}`)
+            setError(`Wallet authentication failed: ${typeof result.error === 'string' ? result.error : (result.error as any).message}`)
           } else {
             // Success! Redirect immediately
             const redirect = searchParams.get('redirect') || getDefaultRedirect('student')
@@ -94,9 +94,10 @@ export default function SignupPage() {
     }
 
     try {
-      const { error } = await signUp(email, password, { name, role })
+      // Default to 'student' role as the generic user type to satisfy DB constraints
+      const { error } = await signUp(email, password, { name, role: 'student' })
       if (error) {
-        setError(error.message || "Failed to create account. Please try again.")
+        setError(typeof error === 'string' ? error : (error as any).message || "Failed to create account. Please try again.")
       } else {
         setSuccess("Account created successfully! Please check your email to verify your account.")
         // Clear form
@@ -224,28 +225,7 @@ export default function SignupPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="role-select">I am a...</Label>
-                <Select value={role} onValueChange={(value: "student" | "lecturer") => setRole(value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="student">
-                      <div className="flex items-center space-x-2">
-                        <User className="h-4 w-4" />
-                        <span>Student</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="lecturer">
-                      <div className="flex items-center space-x-2">
-                        <GraduationCap className="h-4 w-4" />
-                        <span>Lecturer</span>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+
 
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
