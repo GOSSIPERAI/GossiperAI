@@ -104,9 +104,9 @@ export default function FeaturesPage() {
                 <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                   <Shield className="h-6 w-6 text-primary" />
                 </div>
-                <CardTitle>Camp Network-Powered Payments</CardTitle>
+                <CardTitle>Verse-Powered Payments</CardTitle>
                 <CardDescription>
-                  Sustainable micro-payments via Camp Network Pay. Students contribute as little as ₦50 with minimal
+                  Sustainable micro-payments via Verse Pay. Students contribute as little as ₦50 with minimal
                   transaction fees.
                 </CardDescription>
               </CardHeader>
@@ -395,7 +395,7 @@ export default function FeaturesPage() {
             </div>
           </div>
           <div className="border-t border-border mt-12 pt-8 text-center text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()}. All rights reserved. Powered by Camp Network.</p>
+            <p>&copy; {new Date().getFullYear()}. All rights reserved. Powered by Verse.</p>
           </div>
         </div>
       </footer>

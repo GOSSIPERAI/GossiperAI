@@ -54,7 +54,7 @@ export default function SignupPage() {
         try {
           const result = await signInWithWallet(publicKey.toString())
           if (result.error) {
-            setError(`Wallet authentication failed: ${result.error.message}`)
+            setError(`Wallet authentication failed: ${result.error}`)
           } else {
             // Success! Redirect immediately
             const redirect = searchParams.get('redirect') || getDefaultRedirect('student')
@@ -96,7 +96,7 @@ export default function SignupPage() {
     try {
       const { error } = await signUp(email, password, { name, role })
       if (error) {
-        setError(error.message || "Failed to create account. Please try again.")
+        setError(error || "Failed to create account. Please try again.")
       } else {
         setSuccess("Account created successfully! Please check your email to verify your account.")
         // Clear form
@@ -162,7 +162,7 @@ export default function SignupPage() {
             {/* Wallet Signup - Simplified */}
             <div className="space-y-3">
               <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-3">Sign up with your Camp Network wallet</p>
+                <p className="text-sm text-muted-foreground mb-3">Sign up with your Verse wallet</p>
                 {isWalletLoading ? (
                   <Button disabled className="w-full">
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

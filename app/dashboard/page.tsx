@@ -41,6 +41,7 @@ import {
   Search,
   Wallet,
   LogOut,
+  Sparkles,
 } from "lucide-react"
 import Link from "next/link"
 import { AuthGuard } from "@/components/auth-guard"
@@ -147,7 +148,7 @@ export default function DashboardPage() {
   })
 
   useEffect(() => {
-    // Mock dashboard data Camp Networkd on user role
+    // Mock dashboard data based on user role
     if (!user?.role) return
     
     // Use setTimeout to make this non-blocking
@@ -188,7 +189,7 @@ export default function DashboardPage() {
           createMockSession(
             "3", 
             "Chemistry - Organic Compounds", 
-            "Study of carbon-Camp Networkd compounds and their reactions",
+            "Study of carbon-based compounds and their reactions",
             "Dr. Emily Rodriguez", 
             "lecturer3", 
             "ended", 
@@ -330,7 +331,7 @@ export default function DashboardPage() {
               </p>
               {!user?.wallet_connected && (
                 <p className="text-amber-600 text-sm mt-1">
-                  💡 Connect your Camp Network wallet to participate in payment pools
+                  💡 Connect your Verse wallet to participate in payment pools
                 </p>
               )}
             </div>
@@ -460,6 +461,28 @@ export default function DashboardPage() {
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">
+              {/* AI Tutor quick access */}
+              <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between gap-4 flex-wrap">
+                    <div className="flex items-center gap-3">
+                      <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shrink-0">
+                        <Sparkles className="h-5 w-5 text-primary-foreground" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-foreground">Web3 Tutor</p>
+                        <p className="text-sm text-muted-foreground">
+                          Ask questions, summarize a recording, analyze a PDF, or generate an image
+                        </p>
+                      </div>
+                    </div>
+                    <Button asChild>
+                      <Link href="/ai-tutor">Open Tutor</Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Active Sessions */}
               <Card>
                 <CardHeader>

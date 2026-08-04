@@ -76,7 +76,7 @@ export default function LoginPage() {
             }, 100)
           } else {
             console.error('Wallet authentication error:', result.error)
-            setError(`Wallet authentication failed: ${result.error.message}`)
+            setError(`Wallet authentication failed: ${result.error}`)
             setWalletAuthenticating(false)
           }
         } catch (error) {
@@ -109,7 +109,7 @@ export default function LoginPage() {
     try {
       const { error } = await signIn(email, password)
       if (error) {
-        setError(error.message || "Invalid credentials. Please try again.")
+        setError(error || "Invalid credentials. Please try again.")
       } else {
         // Auth state change and redirect are handled by the AuthProvider's user effect
       }
@@ -162,7 +162,7 @@ export default function LoginPage() {
             {/* Wallet Login */}
             <div className="space-y-3">
               <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-3">Connect with your Camp Network wallet</p>
+                <p className="text-sm text-muted-foreground mb-3">Connect with your Verse wallet</p>
                 {walletAuthenticating ? (
                   <Button disabled className="w-full">
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -199,7 +199,7 @@ export default function LoginPage() {
                             router.replace(redirect)
                           }, 100)
                         } else {
-                          setError(`Wallet authentication failed: ${result.error.message}`)
+                          setError(`Wallet authentication failed: ${result.error}`)
                           setWalletAuthenticating(false)
                         }
                       } catch (error) {
