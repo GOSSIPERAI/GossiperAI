@@ -14,10 +14,10 @@ export class AuthValidator {
   }
 
   static validateUsername(username: string): ValidationResult {
-    const usernameRegex = /^[a-zA-Z0-9_-]{3,50}$/
+    const usernameRegex = /^[a-zA-Z0-9 _-]{3,50}$/
     return {
       valid: usernameRegex.test(username),
-      error: usernameRegex.test(username) ? undefined : 'Username must be 3-50 characters and contain only letters, numbers, hyphens, and underscores'
+      error: usernameRegex.test(username) ? undefined : 'Username must be 3-50 characters'
     }
   }
 

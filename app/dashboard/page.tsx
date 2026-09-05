@@ -42,6 +42,8 @@ import {
   Wallet,
   LogOut,
   Sparkles,
+  GraduationCap,
+  UploadCloud,
 } from "lucide-react"
 import Link from "next/link"
 import { AuthGuard } from "@/components/auth-guard"
@@ -49,11 +51,6 @@ import { useAuth } from "@/hooks/use-auth"
 import { useSolana } from "@/hooks/use-solana"
 import { SessionCard } from "@/components/session-card"
 import { Input } from "@/components/ui/input"
-
-// There is a lint error: Property 'profile' does not exist on type 'AuthContextType'.
-// Best practice: Only destructure properties that exist on the returned object from useAuth().
-// Proposal: Remove 'profile' from the destructuring assignment.
-// If you need 'profile', ensure it is provided by useAuth() or fetch it separately.
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth()
@@ -69,7 +66,6 @@ export default function DashboardPage() {
     const fetchBalance = async () => {
       if (connected && publicKey) {
         try {
-          // Add a small delay to not block the initial render
           await new Promise(resolve => setTimeout(resolve, 100))
           const balance = await getBalance()
           if (isMounted) {
@@ -84,7 +80,6 @@ export default function DashboardPage() {
       }
     }
     
-    // Use setTimeout to make this non-blocking
     const timeoutId = setTimeout(fetchBalance, 0)
     
     return () => {
@@ -93,7 +88,6 @@ export default function DashboardPage() {
     }
   }, [connected, publicKey, getBalance])
 
-  // Helper function to create mock sessions
   const createMockSession = (id: string, title: string, description: string, lecturerName: string, lecturerId: string, status: "active" | "scheduled" | "ended", participantCount: number, startTime: Date, languages: string[], paymentGoal: number, currentAmount: number, contributions: number): Session => ({
     id,
     title,
@@ -148,12 +142,8 @@ export default function DashboardPage() {
   })
 
   useEffect(() => {
-    // Mock dashboard data based on user role
-    if (!user?.role) return
-    
-    // Use setTimeout to make this non-blocking
-    const timeoutId = setTimeout(() => {
-      const mockData = {
+    const userRole = user?.role || "student"
+    const mockData = {
       student: {
         activeSessions: [
           createMockSession(
@@ -250,10 +240,7 @@ export default function DashboardPage() {
       },
     }
 
-      setDashboardData(user?.role === "lecturer" ? mockData.lecturer : mockData.student)
-    }, 0) // Execute on next tick
-    
-    return () => clearTimeout(timeoutId)
+    setDashboardData(userRole === "lecturer" ? mockData.lecturer : mockData.student)
   }, [user?.role, user?.full_name, user?.id])
 
   if (!dashboardData) {
@@ -276,20 +263,42 @@ export default function DashboardPage() {
         <nav className="border-b border-border bg-background/95 backdrop-blur sticky top-0 z-40">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 items-center justify-between">
-              <Link href="/" className="flex items-center space-x-2">
-                <div className="h-10 w-10 rounded-lg overflow-hidden bg-gradient-to-br from-primary/20 to-primary/10 p-0.5">
-                  <div className="w-full h-full rounded-md bg-primary/80 flex items-center justify-center">
-                    <Image
-                      src="/gossiper-logo-white.png"
-                      alt="Gossiper Logo"
-                      width={128}
-                      height={128}
-                      className="w-20 h-20 object-contain scale-[2.5]"
-                    />
+              <div className="flex items-center space-x-6">
+                <Link href="/" className="flex items-center space-x-2">
+                  <div className="h-10 w-10 rounded-lg overflow-hidden bg-gradient-to-br from-primary/20 to-primary/10 p-0.5">
+                    <div className="w-full h-full rounded-md bg-primary/80 flex items-center justify-center">
+                      <Image
+                        src="/gossiper-logo-white.png"
+                        alt="Gossiper Logo"
+                        width={128}
+                        height={128}
+                        className="w-20 h-20 object-contain scale-[2.5]"
+                      />
+                    </div>
                   </div>
+                  <span className="text-xl font-bold">Gossiper</span>
+                </Link>
+
+                {/* Top Navigation Links */}
+                <div className="hidden md:flex items-center space-x-4">
+                  <Link href="/dashboard" className="text-sm font-semibold text-primary">
+                    Dashboard
+                  </Link>
+                  <Link href="/academy" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
+                    <GraduationCap className="h-4 w-4" /> Web3 Academy
+                  </Link>
+                  <Link href="/ai-tutor" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
+                    <Sparkles className="h-4 w-4 text-primary" /> AI Tutor
+                  </Link>
+                  <Link href="/features" className="text-sm text-muted-foreground hover:text-foreground">
+                    Features
+                  </Link>
+                  <Link href="/pricing" className="text-sm text-muted-foreground hover:text-foreground">
+                    Pricing
+                  </Link>
                 </div>
-                <span className="text-xl font-bold">Gossiper</span>
-              </Link>
+              </div>
+
               <div className="flex items-center space-x-4">
                 {user?.wallet_connected && (
                   <div className="flex items-center space-x-2 px-3 py-1 bg-primary/10 rounded-full">
@@ -299,20 +308,20 @@ export default function DashboardPage() {
                     </span>
                   </div>
                 )}
-                <Button variant="outline" size="icon">
+                <Button variant="outline" size="icon" title="Notifications">
                   <Bell className="h-4 w-4 hover:text-foreground" />
                 </Button>
-                <Button variant="outline" size="icon">
+                <Button variant="outline" size="icon" title="Settings">
                   <Settings className="h-4 w-4" />
                 </Button>
-                <Button variant="outline" size="icon" onClick={() => signOut()}>
+                <Button variant="outline" size="icon" title="Sign out" onClick={() => signOut()}>
                   <LogOut className="h-4 w-4" />
                 </Button>
                 <div className="flex items-center space-x-2">
                   <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                     <span className="text-sm font-medium text-primary">{user?.full_name?.charAt(0) || "U"}</span>
                   </div>
-                  <span className="text-sm font-medium">{user?.full_name}</span>
+                  <span className="text-sm font-medium hidden sm:inline">{user?.full_name}</span>
                 </div>
               </div>
             </div>
@@ -326,8 +335,8 @@ export default function DashboardPage() {
               <h1 className="text-3xl font-bold text-balance">Welcome back, {user?.full_name?.split(" ")[0] || user?.email?.split("@")[0]}</h1>
               <p className="text-muted-foreground mt-1">
                 {user?.role === "lecturer"
-                  ? "Manage your sessions and track student engagement"
-                  : "Continue learning with AI-powered captions and translations"}
+                  ? "Manage your sessions, upload courses, and track student engagement"
+                  : "Continue learning with AI-powered captions, course modules, and translations"}
               </p>
               {!user?.wallet_connected && (
                 <p className="text-amber-600 text-sm mt-1">
@@ -335,7 +344,13 @@ export default function DashboardPage() {
                 </p>
               )}
             </div>
-            <div className="flex items-center space-x-3 ">
+            <div className="flex items-center space-x-3">
+              <Link href="/academy/upload">
+                <Button variant="secondary" className="flex items-center space-x-2">
+                  <UploadCloud className="h-4 w-4 text-primary" />
+                  <span>Upload Course</span>
+                </Button>
+              </Link>
               {isLecturer && (
                 <Link href="/create-session">
                   <Button className="flex items-center space-x-2">
@@ -461,27 +476,57 @@ export default function DashboardPage() {
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">
-              {/* AI Tutor quick access */}
-              <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between gap-4 flex-wrap">
-                    <div className="flex items-center gap-3">
-                      <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shrink-0">
-                        <Sparkles className="h-5 w-5 text-primary-foreground" />
+              {/* Web3 Academy & Web3 Tutor Quick Access Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Web3 Academy Quick Access Card */}
+                <Card className="border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent hover:border-primary/40 transition-colors">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between gap-4 flex-wrap">
+                      <div className="flex items-center gap-3">
+                        <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shrink-0">
+                          <GraduationCap className="h-5 w-5 text-primary-foreground" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">Web3 Academy</p>
+                          <p className="text-sm text-muted-foreground">
+                            Browse course modules, video lectures, and upload custom courses
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-semibold text-foreground">Web3 Tutor</p>
-                        <p className="text-sm text-muted-foreground">
-                          Ask questions, summarize a recording, analyze a PDF, or generate an image
-                        </p>
+                      <div className="flex items-center gap-2">
+                        <Button asChild variant="outline" size="sm">
+                          <Link href="/academy/upload">Upload</Link>
+                        </Button>
+                        <Button asChild size="sm">
+                          <Link href="/academy">Go to Academy</Link>
+                        </Button>
                       </div>
                     </div>
-                    <Button asChild>
-                      <Link href="/ai-tutor">Open Tutor</Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+
+                {/* AI Tutor Card */}
+                <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent hover:border-primary/40 transition-colors">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between gap-4 flex-wrap">
+                      <div className="flex items-center gap-3">
+                        <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shrink-0">
+                          <Sparkles className="h-5 w-5 text-primary-foreground" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">Web3 Tutor</p>
+                          <p className="text-sm text-muted-foreground">
+                            Ask questions, summarize a recording, or analyze a PDF
+                          </p>
+                        </div>
+                      </div>
+                      <Button asChild size="sm">
+                        <Link href="/ai-tutor">Open Tutor</Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
 
               {/* Active Sessions */}
               <Card>

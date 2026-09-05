@@ -126,7 +126,7 @@ export function getAuthErrorMessage(error: string): string {
     'Server error': 'An unexpected error occurred. Please try again later.'
   }
   
-  return errorMessages[error] || 'An unexpected error occurred. Please try again.'
+  return errorMessages[error] || error || 'An unexpected error occurred. Please try again.'
 }
 
 /**

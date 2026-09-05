@@ -94,21 +94,17 @@ export default function SignupPage() {
     }
 
     try {
-      const { error } = await signUp(email, password, { name, role })
-      if (error) {
-        setError(error || "Failed to create account. Please try again.")
+      const result = await signUp(email, password, { name, role })
+      if (!result.success || result.error) {
+        setError(result.error || "Failed to create account. Please try again.")
       } else {
-        setSuccess("Account created successfully! Please check your email to verify your account.")
-        // Clear form
-        setEmail("")
-        setPassword("")
-        setConfirmPassword("")
-        setName("")
-        // Note: User will need to verify email before they can sign in
-        // No automatic redirect since email verification is required
+        setSuccess("Account created successfully! Redirecting...")
+        const redirect = searchParams.get('redirect') || getDefaultRedirect(role)
+        router.push(redirect)
       }
-    } catch (err) {
-      setError("An unexpected error occurred. Please try again.")
+    } catch (err: any) {
+      console.error("Signup page error:", err)
+      setError(err?.message || "An unexpected error occurred. Please try again.")
     } finally {
       setIsLoading(false)
     }

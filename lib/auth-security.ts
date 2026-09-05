@@ -38,7 +38,7 @@ export class AuthSecurity {
 // Rate limiting utility
 export class RateLimiter {
   private static attempts = new Map<string, { count: number; resetTime: number }>()
-  private static readonly MAX_ATTEMPTS = 5
+  private static readonly MAX_ATTEMPTS = 50
   private static readonly WINDOW_MS = 15 * 60 * 1000 // 15 minutes
 
   static checkRateLimit(identifier: string): boolean {

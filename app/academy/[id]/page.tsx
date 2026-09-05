@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ProtectedMediaPlayer } from "@/components/protected-media-player"
 import {
   Dialog,
   DialogContent,
@@ -24,8 +25,17 @@ import {
   Circle,
   Trophy,
   BookOpen,
-  ExternalLink,
+  Video,
+  FileText,
+  Lock,
 } from "lucide-react"
+
+type Lesson = {
+  id: string
+  title: string
+  content: string
+  order_index: number
+}
 
 type Assignment = {
   id: string
@@ -81,6 +91,7 @@ export default function AcademyModuleDetailPage({ params }: { params: { id: stri
 
 function ModuleDetail({ moduleId }: { moduleId: string }) {
   const [module, setModule] = useState<ModuleDetail | null>(null)
+  const [lessons, setLessons] = useState<Lesson[]>([])
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [quizzes, setQuizzes] = useState<Quiz[]>([])
   const [resources, setResources] = useState<Resource[]>([])
@@ -102,6 +113,7 @@ function ModuleDetail({ moduleId }: { moduleId: string }) {
       const data = await res.json()
       if (res.ok) {
         setModule(data.module)
+        setLessons(data.lessons || [])
         setAssignments(data.assignments || [])
         setQuizzes(data.quizzes || [])
         setResources(data.resources || [])
@@ -175,14 +187,71 @@ function ModuleDetail({ moduleId }: { moduleId: string }) {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-3xl">
-        <Tabs defaultValue="work" onValueChange={(v) => v === "leaderboard" && loadLeaderboard()}>
-          <TabsList className="grid w-full grid-cols-4">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-4xl">
+        <Tabs defaultValue="lessons" onValueChange={(v) => v === "leaderboard" && loadLeaderboard()}>
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="lessons">Videos & Content</TabsTrigger>
             <TabsTrigger value="work">Work</TabsTrigger>
             <TabsTrigger value="quizzes">Quizzes</TabsTrigger>
             <TabsTrigger value="resources">Resources</TabsTrigger>
             <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
           </TabsList>
+
+          {/* VIDEOS & CONTENT TAB */}
+          <TabsContent value="lessons" className="space-y-6 mt-4">
+            {/* Display Uploaded Video / Document Media Resources */}
+            {resources.length > 0 && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold flex items-center gap-2">
+                    <Video className="h-4 w-4 text-primary" /> Video Lectures & Course Files
+                  </h3>
+                  <Badge variant="outline" className="text-[10px] flex items-center gap-1">
+                    <Lock className="h-3 w-3 text-amber-500" /> Non-Downloadable Protected Media
+                  </Badge>
+                </div>
+                <div className="space-y-4">
+                  {resources.map((res) => (
+                    <ProtectedMediaPlayer
+                      key={res.id}
+                      id={res.id}
+                      url={res.url}
+                      title={res.title}
+                      resourceType={res.resource_type}
+                      onDelete={loadModule}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Written Lessons */}
+            {lessons.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-primary" /> Written Lessons ({lessons.length})
+                </h3>
+                <div className="space-y-4">
+                  {lessons.map((lesson) => (
+                    <Card key={lesson.id}>
+                      <CardContent className="p-5 space-y-2">
+                        <h4 className="font-semibold text-base">{lesson.title}</h4>
+                        <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                          {lesson.content}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {resources.length === 0 && lessons.length === 0 && (
+              <p className="text-sm text-muted-foreground py-4">
+                No video lectures or written lessons uploaded for this module yet.
+              </p>
+            )}
+          </TabsContent>
 
           {/* WORK TAB */}
           <TabsContent value="work" className="space-y-3 mt-4">
@@ -258,25 +327,30 @@ function ModuleDetail({ moduleId }: { moduleId: string }) {
           </TabsContent>
 
           {/* RESOURCES TAB */}
-          <TabsContent value="resources" className="space-y-3 mt-4">
+          <TabsContent value="resources" className="space-y-4 mt-4">
             {resources.length === 0 ? (
               <p className="text-sm text-muted-foreground">No resources added yet.</p>
             ) : (
               resources.map((r) => (
-                <a key={r.id} href={r.url} target="_blank" rel="noopener noreferrer">
-                  <Card className="hover:border-primary/50 transition-colors">
-                    <CardContent className="p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <BookOpen className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{r.title}</span>
-                        <Badge variant="secondary" className="text-[10px] capitalize">
-                          {r.resource_type}
-                        </Badge>
-                      </div>
-                      <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
-                    </CardContent>
-                  </Card>
-                </a>
+                <div key={r.id}>
+                  {r.url.startsWith("/api/academy/media") ? (
+                    <ProtectedMediaPlayer url={r.url} title={r.title} resourceType={r.resource_type} />
+                  ) : (
+                    <a href={r.url} target="_blank" rel="noopener noreferrer">
+                      <Card className="hover:border-primary/50 transition-colors">
+                        <CardContent className="p-4 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <BookOpen className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm">{r.title}</span>
+                            <Badge variant="secondary" className="text-[10px] capitalize">
+                              {r.resource_type}
+                            </Badge>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </a>
+                  )}
+                </div>
               ))
             )}
           </TabsContent>

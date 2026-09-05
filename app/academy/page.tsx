@@ -6,7 +6,8 @@ import { AuthGuard } from "@/components/auth-guard"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { GraduationCap, Loader2, ChevronRight } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { GraduationCap, Loader2, ChevronRight, UploadCloud, Plus } from "lucide-react"
 
 type ModuleSummary = {
   id: string
@@ -51,14 +52,22 @@ function AcademyModulesList() {
   return (
     <div className="min-h-screen bg-background">
       <div className="border-b border-border bg-card/50 backdrop-blur sticky top-0 z-10">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
-            <GraduationCap className="h-5 w-5 text-primary-foreground" />
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
+              <GraduationCap className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-lg font-semibold text-foreground leading-tight">Web3 Academy</h1>
+              <p className="text-xs text-muted-foreground">Your modules, video lectures, and progress</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-lg font-semibold text-foreground leading-tight">Web3 Academy</h1>
-            <p className="text-xs text-muted-foreground">Your modules, assignments, and progress</p>
-          </div>
+
+          <Button asChild className="flex items-center gap-2">
+            <Link href="/academy/upload">
+              <UploadCloud className="h-4 w-4" /> Upload / Create Course
+            </Link>
+          </Button>
         </div>
       </div>
 
@@ -70,7 +79,14 @@ function AcademyModulesList() {
         ) : error ? (
           <p className="text-sm text-destructive">{error}</p>
         ) : modules.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No modules found yet.</p>
+          <div className="text-center py-12 space-y-4">
+            <p className="text-muted-foreground">No course modules found yet.</p>
+            <Button asChild>
+              <Link href="/academy/upload">
+                <Plus className="h-4 w-4 mr-2" /> Upload Your First Course
+              </Link>
+            </Button>
+          </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {modules.map((mod) => (
